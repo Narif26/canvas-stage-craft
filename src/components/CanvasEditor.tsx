@@ -9,7 +9,9 @@ interface CanvasItem {
   image: string;
   x: number;
   y: number;
-  scale: number;
+  scale?: number;
+  scaleX?: number;
+  scaleY?: number;
   rotation: number;
 }
 
@@ -39,8 +41,8 @@ const CanvasImageComponent = ({ item, isSelected, onSelect, onChange }: CanvasIm
         image={image}
         x={item.x}
         y={item.y}
-        scaleX={item.scale}
-        scaleY={item.scale}
+        scaleX={item.scaleX ?? item.scale ?? 1}
+        scaleY={item.scaleY ?? item.scale ?? 1}
         rotation={item.rotation}
         width={150}
         height={150}
@@ -57,8 +59,10 @@ const CanvasImageComponent = ({ item, isSelected, onSelect, onChange }: CanvasIm
           const node = imageRef.current;
           if (node) {
             const scaleX = node.scaleX();
+            const scaleY = node.scaleY();
             onChange({
-              scale: scaleX,
+              scaleX: scaleX,
+              scaleY: scaleY,
               rotation: node.rotation(),
             });
           }
@@ -67,9 +71,10 @@ const CanvasImageComponent = ({ item, isSelected, onSelect, onChange }: CanvasIm
       {isSelected && (
         <Transformer
           ref={trRef}
-          keepRatio
+          keepRatio={false}
+          enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right', 'top-center', 'bottom-center']}
           boundBoxFunc={(oldBox, newBox) => {
-            if (newBox.width < 50 || newBox.height < 50) {
+            if (newBox.width < 30 || newBox.height < 30) {
               return oldBox;
             }
             return newBox;

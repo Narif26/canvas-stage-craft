@@ -18,7 +18,18 @@ const SINGLE_SELECT_CATEGORIES: InventoryCategory[] = ["Backdrops", "Sofas"];
 const getInitialQuantities = (): QuantityState => {
   const stored = sessionStorage.getItem(STORAGE_KEY);
   if (stored) {
-    return JSON.parse(stored);
+    const parsed = JSON.parse(stored);
+    // Validate stored data matches current inventory - if item exists in inventory but not in stored, reset
+    const needsReset = inventoryData.some(item => !(item.id in parsed));
+    if (needsReset) {
+      const initial: QuantityState = {};
+      inventoryData.forEach((item) => {
+        initial[item.id] = item.quantity;
+      });
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+      return initial;
+    }
+    return parsed;
   }
   // Initialize from inventory data
   const initial: QuantityState = {};
