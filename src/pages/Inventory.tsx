@@ -8,9 +8,21 @@ import { useInventoryQuantities } from "@/hooks/useInventoryQuantities";
 
 const Inventory = () => {
   const navigate = useNavigate();
-  const { quantities, decrementQuantity, getAvailableQuantity } = useInventoryQuantities();
+  const { 
+    quantities, 
+    decrementQuantity, 
+    getAvailableQuantity,
+    isCategoryLocked,
+    getCategoryLockMessage 
+  } = useInventoryQuantities();
 
   const handleAddToCanvas = (item: InventoryItem) => {
+    // Check if category is locked for this item
+    if (isCategoryLocked(item.category, item.id)) {
+      toast.error(getCategoryLockMessage(item.category));
+      return;
+    }
+
     const available = getAvailableQuantity(item.id);
     if (available <= 0) {
       toast.error(`${item.name} is out of stock!`);
@@ -34,8 +46,8 @@ const Inventory = () => {
     items.push(newItem);
     sessionStorage.setItem("canvasItems", JSON.stringify(items));
     
-    // Decrement the quantity
-    decrementQuantity(item.id);
+    // Decrement the quantity and track category selection
+    decrementQuantity(item.id, item.category);
     
     toast.success(`${item.name} added to canvas!`);
   };
@@ -71,7 +83,12 @@ const Inventory = () => {
         </div>
 
         {/* Inventory List */}
-        <InventoryList onAddToCanvas={handleAddToCanvas} quantities={quantities} />
+        <InventoryList 
+          onAddToCanvas={handleAddToCanvas} 
+          quantities={quantities}
+          isCategoryLocked={isCategoryLocked}
+          getCategoryLockMessage={getCategoryLockMessage}
+        />
       </div>
     </div>
   );
