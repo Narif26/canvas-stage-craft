@@ -93,9 +93,14 @@ const Canvas = () => {
       const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 });
       const base64 = dataUrl.split(",")[1];
 
+      // Format the prompt for image generation
+      const formattedPrompt = prompt.trim()
+        ? `Generate an image of a ${prompt} decor set up, adhering to the items shown in the attached image`
+        : "Generate an image of a decor set up, adhering to the items shown in the attached image";
+
       const response = await generateLayout({
         imageBase64: base64,
-        prompt,
+        prompt: formattedPrompt,
         variations,
       });
 
