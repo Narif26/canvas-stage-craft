@@ -6,10 +6,13 @@ import { InventoryItem } from "@/data/inventory";
 
 interface InventoryItemCardProps {
   item: InventoryItem;
+  availableQuantity: number;
   onAddToCanvas: (item: InventoryItem) => void;
 }
 
-export const InventoryItemCard = ({ item, onAddToCanvas }: InventoryItemCardProps) => {
+export const InventoryItemCard = ({ item, availableQuantity, onAddToCanvas }: InventoryItemCardProps) => {
+  const isOutOfStock = availableQuantity <= 0;
+
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden border-2 hover:border-accent/50">
       <CardContent className="p-0">
@@ -29,8 +32,8 @@ export const InventoryItemCard = ({ item, onAddToCanvas }: InventoryItemCardProp
               <Badge variant="secondary" className="text-xs">
                 {item.category}
               </Badge>
-              <span className="text-sm text-muted-foreground">
-                Qty: {item.quantity}
+              <span className={`text-sm ${isOutOfStock ? 'text-destructive' : 'text-muted-foreground'}`}>
+                Qty: {availableQuantity}
               </span>
             </div>
           </div>
@@ -39,9 +42,10 @@ export const InventoryItemCard = ({ item, onAddToCanvas }: InventoryItemCardProp
             onClick={() => onAddToCanvas(item)}
             className="w-full"
             size="sm"
+            disabled={isOutOfStock}
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add to Canvas
+            {isOutOfStock ? "Out of Stock" : "Add to Canvas"}
           </Button>
         </div>
       </CardContent>
