@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAiResults } from "@/contexts/AiResultsContext";
 import { generateLayout } from "@/utils/generateLayoutApi";
+import { inventoryData } from "@/data/inventory";
 import Konva from "konva";
 
 interface CanvasItem {
@@ -19,6 +20,16 @@ interface CanvasItem {
   scale: number;
   rotation: number;
 }
+
+const QUANTITY_STORAGE_KEY = "inventoryQuantities";
+
+const resetInventoryQuantities = () => {
+  const initial: Record<string, number> = {};
+  inventoryData.forEach((item) => {
+    initial[item.id] = item.quantity;
+  });
+  sessionStorage.setItem(QUANTITY_STORAGE_KEY, JSON.stringify(initial));
+};
 
 const Canvas = () => {
   const navigate = useNavigate();
@@ -72,7 +83,11 @@ const Canvas = () => {
     const newHistory = [...history, []];
     setHistory(newHistory);
     setHistoryStep(newHistory.length - 1);
-    toast.success("Canvas cleared");
+    
+    // Reset inventory quantities
+    resetInventoryQuantities();
+    
+    toast.success("Canvas cleared and inventory reset");
   };
 
 

@@ -4,11 +4,19 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { InventoryItem } from "@/data/inventory";
 import { toast } from "sonner";
+import { useInventoryQuantities } from "@/hooks/useInventoryQuantities";
 
 const Inventory = () => {
   const navigate = useNavigate();
+  const { quantities, decrementQuantity, getAvailableQuantity } = useInventoryQuantities();
 
   const handleAddToCanvas = (item: InventoryItem) => {
+    const available = getAvailableQuantity(item.id);
+    if (available <= 0) {
+      toast.error(`${item.name} is out of stock!`);
+      return;
+    }
+
     // Get existing canvas items from sessionStorage
     const existingItems = sessionStorage.getItem("canvasItems");
     const items = existingItems ? JSON.parse(existingItems) : [];
@@ -25,6 +33,9 @@ const Inventory = () => {
     
     items.push(newItem);
     sessionStorage.setItem("canvasItems", JSON.stringify(items));
+    
+    // Decrement the quantity
+    decrementQuantity(item.id);
     
     toast.success(`${item.name} added to canvas!`);
   };
@@ -60,7 +71,7 @@ const Inventory = () => {
         </div>
 
         {/* Inventory List */}
-        <InventoryList onAddToCanvas={handleAddToCanvas} />
+        <InventoryList onAddToCanvas={handleAddToCanvas} quantities={quantities} />
       </div>
     </div>
   );
