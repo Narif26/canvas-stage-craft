@@ -1,3 +1,7 @@
+import stringLightsImg from "@/assets/string_lights.jpg";
+import chandelierImg from "@/assets/chandelier.jpg";
+import uplightImg from "@/assets/uplight.jpg";
+
 export type InventoryCategory = "Backdrops" | "Sofas" | "Chairs" | "Flowers" | "Props" | "Lighting";
 
 export interface InventoryItem {
@@ -45,21 +49,21 @@ export const inventoryData: InventoryItem[] = [
     id: "light-1",
     name: "String Lights",
     category: "Lighting",
-    image: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=400&h=400&fit=crop",
+    image: stringLightsImg,
     quantity: 30,
   },
   {
     id: "light-2",
     name: "Chandelier",
     category: "Lighting",
-    image: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=400&h=400&fit=crop",
+    image: chandelierImg,
     quantity: 10,
   },
   {
     id: "light-3",
     name: "LED Uplights",
     category: "Lighting",
-    image: "https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=400&h=400&fit=crop",
+    image: uplightImg,
     quantity: 40,
   },
 ];
