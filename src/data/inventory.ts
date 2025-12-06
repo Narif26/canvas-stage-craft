@@ -6,6 +6,12 @@ import pinkCurtainImg from "@/assets/pink_curtain.png";
 import midSizeSofaImg from "@/assets/mid_size_sofa.png";
 import smallSofaImg from "@/assets/small_sofa.png";
 import smallBenchImg from "@/assets/small_bench.png";
+import colorfulArch2Img from "@/assets/colorful_arch_2.png";
+import goldBackdropImg from "@/assets/gold_backdrop.png";
+import rectangleFlowerArchImg from "@/assets/rectangle_flower_arch.png";
+import rectangleFlowerArch2Img from "@/assets/rectangle_flower_arch2.png";
+import roundBackdropImg from "@/assets/round_backdrop.png";
+import sideChairImg from "@/assets/side_chair.png";
 
 export type InventoryCategory = "Backdrops" | "Sofas" | "Chairs" | "Flowers" | "Props" | "Lighting";
 
@@ -33,6 +39,41 @@ export const inventoryData: InventoryItem[] = [
     image: pinkCurtainImg,
     quantity: 1,
   },
+  {
+    id: "backdrop-3",
+    name: "Colorful Curtain Arch",
+    category: "Backdrops",
+    image: colorfulArch2Img,
+    quantity: 1,
+  },
+  {
+    id: "backdrop-4",
+    name: "Gold Backdrop",
+    category: "Backdrops",
+    image: goldBackdropImg,
+    quantity: 1,
+  },
+  {
+    id: "backdrop-5",
+    name: "Rectangle Flower Arch",
+    category: "Backdrops",
+    image: rectangleFlowerArchImg,
+    quantity: 1,
+  },
+  {
+    id: "backdrop-6",
+    name: "Rectangle Flower Arch 2",
+    category: "Backdrops",
+    image: rectangleFlowerArch2Img,
+    quantity: 1,
+  },
+  {
+    id: "backdrop-7",
+    name: "Round Backdrop",
+    category: "Backdrops",
+    image: roundBackdropImg,
+    quantity: 1,
+  },
   
   // Sofas
   {
@@ -57,6 +98,13 @@ export const inventoryData: InventoryItem[] = [
     category: "Chairs",
     image: smallBenchImg,
     quantity: 1,
+  },
+  {
+    id: "chair-2",
+    name: "Side Chair",
+    category: "Chairs",
+    image: sideChairImg,
+    quantity: 2,
   },
   
   // Flowers - empty, add your own items

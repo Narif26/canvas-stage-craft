@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { InventoryItemCard } from "./InventoryItemCard";
-import { inventoryData, categories, InventoryItem } from "@/data/inventory";
+import { inventoryData, categories, InventoryItem, InventoryCategory } from "@/data/inventory";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { QuantityState } from "@/hooks/useInventoryQuantities";
@@ -8,9 +8,16 @@ import { QuantityState } from "@/hooks/useInventoryQuantities";
 interface InventoryListProps {
   onAddToCanvas: (item: InventoryItem) => void;
   quantities: QuantityState;
+  isCategoryLocked: (category: InventoryCategory, itemId: string) => boolean;
+  getCategoryLockMessage: (category: InventoryCategory) => string;
 }
 
-export const InventoryList = ({ onAddToCanvas, quantities }: InventoryListProps) => {
+export const InventoryList = ({ 
+  onAddToCanvas, 
+  quantities,
+  isCategoryLocked,
+  getCategoryLockMessage 
+}: InventoryListProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const filteredItems = selectedCategory
@@ -48,6 +55,8 @@ export const InventoryList = ({ onAddToCanvas, quantities }: InventoryListProps)
               <InventoryItemCard
                 item={item}
                 availableQuantity={quantities[item.id] ?? item.quantity}
+                isCategoryLocked={isCategoryLocked(item.category, item.id)}
+                lockMessage={getCategoryLockMessage(item.category)}
                 onAddToCanvas={onAddToCanvas}
               />
             </div>
