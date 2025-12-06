@@ -53,6 +53,7 @@ serve(async (req) => {
         },
       ],
       generationConfig: {
+        responseModalities: ["TEXT", "IMAGE"],
         candidateCount: 1,
       },
     };
@@ -76,6 +77,7 @@ serve(async (req) => {
 
     const data = await response.json();
     console.log("Gemini response received");
+    console.log("Gemini response structure:", JSON.stringify(data, null, 2));
 
     // Extract the generated image
     const candidates = data.candidates || [];
@@ -84,9 +86,9 @@ serve(async (req) => {
     for (const candidate of candidates) {
       const parts = candidate.content?.parts || [];
       for (const part of parts) {
-        if (part.inline_data?.data) {
-          const mime = part.inline_data.mime_type || "image/png";
-          images.push(`data:${mime};base64,${part.inline_data.data}`);
+        if (part.inlineData?.data) {
+          const mime = part.inlineData.mimeType || "image/png";
+          images.push(`data:${mime};base64,${part.inlineData.data}`);
         }
       }
     }
