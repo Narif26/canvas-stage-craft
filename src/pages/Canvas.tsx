@@ -17,11 +17,14 @@ interface CanvasItem {
   image: string;
   x: number;
   y: number;
-  scale: number;
+  scale?: number;
+  scaleX?: number;
+  scaleY?: number;
   rotation: number;
 }
 
 const QUANTITY_STORAGE_KEY = "inventoryQuantities";
+const SELECTED_CATEGORIES_KEY = "selectedCategories";
 
 const resetInventoryQuantities = () => {
   const initial: Record<string, number> = {};
@@ -29,6 +32,7 @@ const resetInventoryQuantities = () => {
     initial[item.id] = item.quantity;
   });
   sessionStorage.setItem(QUANTITY_STORAGE_KEY, JSON.stringify(initial));
+  sessionStorage.setItem(SELECTED_CATEGORIES_KEY, JSON.stringify({}));
 };
 
 const Canvas = () => {

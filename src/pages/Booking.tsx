@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, PenLine } from "lucide-react";
 import { toast } from "sonner";
 
 const Booking = () => {
@@ -68,19 +68,29 @@ const Booking = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
+          <div className="flex items-start justify-between mb-8">
+            <div>
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/export")}
+                className="mb-4"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Export
+              </Button>
+              <h1 className="text-4xl font-bold mb-2">Book Your Event</h1>
+              <p className="text-muted-foreground">
+                Fill in your details and we'll get back to you
+              </p>
+            </div>
             <Button
-              variant="ghost"
-              onClick={() => navigate("/export")}
-              className="mb-4"
+              variant="outline"
+              onClick={() => navigate("/canvas")}
+              className="shrink-0"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Export
+              <PenLine className="w-4 h-4 mr-2" />
+              Return to Canvas
             </Button>
-            <h1 className="text-4xl font-bold mb-2">Book Your Event</h1>
-            <p className="text-muted-foreground">
-              Fill in your details and we'll get back to you
-            </p>
           </div>
 
           {/* Booking Form */}

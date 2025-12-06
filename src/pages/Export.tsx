@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Download, Calendar, ArrowLeft } from "lucide-react";
+import { Download, Calendar, ArrowLeft, PenLine } from "lucide-react";
 import { toast } from "sonner";
 import { useAiResults } from "@/contexts/AiResultsContext";
 
@@ -35,19 +35,29 @@ const Export = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
+          <div className="flex items-start justify-between mb-8">
+            <div>
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/ai-results")}
+                className="mb-4"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to AI Results
+              </Button>
+              <h1 className="text-4xl font-bold mb-2">Your AI Generated Layouts</h1>
+              <p className="text-muted-foreground">
+                Download your layouts and proceed to booking
+              </p>
+            </div>
             <Button
-              variant="ghost"
-              onClick={() => navigate("/ai-results")}
-              className="mb-4"
+              variant="outline"
+              onClick={() => navigate("/canvas")}
+              className="shrink-0"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to AI Results
+              <PenLine className="w-4 h-4 mr-2" />
+              Return to Canvas
             </Button>
-            <h1 className="text-4xl font-bold mb-2">Your AI Generated Layouts</h1>
-            <p className="text-muted-foreground">
-              Download your layouts and proceed to booking
-            </p>
           </div>
 
           {/* AI Generated Images */}
@@ -60,7 +70,7 @@ const Export = () => {
                     onClick={() => handleDownload(image, index)}
                   >
                     <Download className="w-4 h-4 mr-2" />
-                    Download Layout
+                    Download PNG
                   </Button>
                 </div>
                 <img
