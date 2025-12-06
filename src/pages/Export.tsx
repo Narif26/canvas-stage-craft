@@ -54,8 +54,7 @@ const Export = () => {
           <div className="space-y-6 mb-8">
             {aiImages.map((image, index) => (
               <div key={index} className="bg-card border rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-medium text-lg">Variation {index + 1}</span>
+                <div className="flex justify-end mb-4">
                   <Button
                     variant="outline"
                     onClick={() => handleDownload(image, index)}
