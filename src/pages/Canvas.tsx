@@ -2,9 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { CanvasEditor } from "@/components/CanvasEditor";
 import { Toolbar } from "@/components/Toolbar";
+import { AiGenerationPanel } from "@/components/AiGenerationPanel";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { useAiResults } from "@/contexts/AiResultsContext";
+import { generateLayout } from "@/utils/generateLayoutApi";
 import Konva from "konva";
 
 interface CanvasItem {
@@ -23,6 +26,7 @@ const Canvas = () => {
   const [items, setItems] = useState<CanvasItem[]>([]);
   const [history, setHistory] = useState<CanvasItem[][]>([]);
   const [historyStep, setHistoryStep] = useState(0);
+  const { setAiImages, isGenerating, setIsGenerating } = useAiResults();
 
   useEffect(() => {
     const savedItems = sessionStorage.getItem("canvasItems");
@@ -80,6 +84,36 @@ const Canvas = () => {
     navigate("/export");
   };
 
+  const handleAiGenerate = async (prompt: string, variations: number) => {
+    if (!stageRef.current) return;
+
+    setIsGenerating(true);
+
+    try {
+      const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 });
+      const base64 = dataUrl.split(",")[1];
+
+      const response = await generateLayout({
+        imageBase64: base64,
+        prompt,
+        variations,
+      });
+
+      if (response.images.length > 0) {
+        setAiImages(response.images);
+        toast.success("AI layouts generated!");
+        navigate("/ai-results");
+      } else {
+        toast.error("No images were generated. Please try again.");
+      }
+    } catch (error) {
+      console.error("AI generation error:", error);
+      toast.error("Failed to generate AI layouts. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -113,13 +147,25 @@ const Canvas = () => {
           />
         </div>
 
-        {/* Canvas */}
-        <div className="flex justify-center">
-          <CanvasEditor
-            items={items}
-            onItemsChange={handleItemsChange}
-            stageRef={stageRef}
-          />
+        {/* Canvas + AI Panel Layout */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Canvas */}
+          <div className="flex-1 flex justify-center">
+            <CanvasEditor
+              items={items}
+              onItemsChange={handleItemsChange}
+              stageRef={stageRef}
+            />
+          </div>
+
+          {/* AI Generation Panel */}
+          <div className="lg:w-80">
+            <AiGenerationPanel
+              onGenerate={handleAiGenerate}
+              isGenerating={isGenerating}
+              hasItems={items.length > 0}
+            />
+          </div>
         </div>
 
         {items.length === 0 && (
