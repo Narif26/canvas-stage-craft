@@ -1,32 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Download, Calendar, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { useAiResults } from "@/contexts/AiResultsContext";
 
 const Export = () => {
   const navigate = useNavigate();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const { aiImages } = useAiResults();
 
   useEffect(() => {
-    const savedImage = sessionStorage.getItem("exportedCanvas");
-    if (savedImage) {
-      setImageUrl(savedImage);
-    } else {
-      toast.error("No exported layout found");
+    if (aiImages.length === 0) {
+      toast.error("No AI generated layouts found");
       navigate("/canvas");
     }
-  }, [navigate]);
+  }, [aiImages, navigate]);
 
-  const handleDownload = () => {
-    if (!imageUrl) return;
-    
+  const handleDownload = (imageUrl: string, index: number) => {
     const link = document.createElement("a");
-    link.download = `event-layout-${Date.now()}.png`;
     link.href = imageUrl;
+    link.download = `ai-layout-${index + 1}-${Date.now()}.png`;
+    document.body.appendChild(link);
     link.click();
-    toast.success("Layout downloaded!");
+    document.body.removeChild(link);
+    toast.success(`Downloaded layout ${index + 1}`);
   };
+
+  if (aiImages.length === 0) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,45 +38,47 @@ const Export = () => {
           <div className="mb-8">
             <Button
               variant="ghost"
-              onClick={() => navigate("/canvas")}
+              onClick={() => navigate("/ai-results")}
               className="mb-4"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Canvas
+              Back to AI Results
             </Button>
-            <h1 className="text-4xl font-bold mb-2">Your Event Layout</h1>
+            <h1 className="text-4xl font-bold mb-2">Your AI Generated Layouts</h1>
             <p className="text-muted-foreground">
-              Review your design and proceed to booking
+              Download your layouts and proceed to booking
             </p>
           </div>
 
-          {/* Exported Image */}
-          {imageUrl && (
-            <div className="bg-card border rounded-xl p-6 mb-8 shadow-lg">
-              <img
-                src={imageUrl}
-                alt="Exported Layout"
-                className="w-full rounded-lg shadow-md"
-              />
-            </div>
-          )}
+          {/* AI Generated Images */}
+          <div className="space-y-6 mb-8">
+            {aiImages.map((image, index) => (
+              <div key={index} className="bg-card border rounded-xl p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="font-medium text-lg">Variation {index + 1}</span>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleDownload(image, index)}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Layout
+                  </Button>
+                </div>
+                <img
+                  src={image}
+                  alt={`AI Generated Layout ${index + 1}`}
+                  className="w-full rounded-lg shadow-md"
+                />
+              </div>
+            ))}
+          </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={handleDownload}
-              className="flex-1 sm:flex-none"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Download Layout
-            </Button>
-            
+          <div className="flex justify-center">
             <Button
               size="lg"
               onClick={() => navigate("/booking")}
-              className="flex-1 sm:flex-none shadow-lg"
+              className="shadow-lg"
             >
               <Calendar className="w-4 h-4 mr-2" />
               Proceed to Booking

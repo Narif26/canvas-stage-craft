@@ -75,14 +75,6 @@ const Canvas = () => {
     toast.success("Canvas cleared");
   };
 
-  const handleExport = () => {
-    if (!stageRef.current) return;
-    
-    const uri = stageRef.current.toDataURL({ pixelRatio: 2 });
-    sessionStorage.setItem("exportedCanvas", uri);
-    toast.success("Layout exported!");
-    navigate("/export");
-  };
 
   const handleAiGenerate = async (prompt: string, variations: number) => {
     if (!stageRef.current) return;
@@ -146,7 +138,6 @@ const Canvas = () => {
             onUndo={handleUndo}
             onRedo={handleRedo}
             onClear={handleClear}
-            onExport={handleExport}
             canUndo={historyStep > 0}
             canRedo={historyStep < history.length - 1}
           />

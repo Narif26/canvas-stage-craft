@@ -1,16 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Undo, Redo, Trash2, Download } from "lucide-react";
+import { Undo, Redo, Trash2 } from "lucide-react";
 
 interface ToolbarProps {
   onUndo: () => void;
   onRedo: () => void;
   onClear: () => void;
-  onExport: () => void;
   canUndo: boolean;
   canRedo: boolean;
 }
 
-export const Toolbar = ({ onUndo, onRedo, onClear, onExport, canUndo, canRedo }: ToolbarProps) => {
+export const Toolbar = ({ onUndo, onRedo, onClear, canUndo, canRedo }: ToolbarProps) => {
   return (
     <div className="flex items-center gap-2 p-4 bg-card border rounded-xl shadow-sm">
       <Button
@@ -42,17 +41,6 @@ export const Toolbar = ({ onUndo, onRedo, onClear, onExport, canUndo, canRedo }:
       >
         <Trash2 className="w-4 h-4 mr-2" />
         Clear All
-      </Button>
-      
-      <div className="flex-1" />
-      
-      <Button
-        size="sm"
-        onClick={onExport}
-        className="bg-accent text-accent-foreground hover:bg-accent/90"
-      >
-        <Download className="w-4 h-4 mr-2" />
-        Export Layout
       </Button>
     </div>
   );
