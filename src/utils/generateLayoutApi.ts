@@ -1,64 +1,88 @@
-interface GenerateLayoutRequest {
-  imageBase64: string;
+// src/utils/generateLayoutApi.ts
+
+export interface GenerateLayoutRequest {
+  imageBase64: string; // base64 WITHOUT "data:image/png;base64,"
   prompt: string;
   variations: number;
 }
 
-interface GenerateLayoutResponse {
-  images: string[];
+export interface GenerateLayoutResponse {
+  images: string[]; // data URLs you can render directly in <img src=...>
 }
 
-// Mock placeholder image generator
-const generateMockImage = (index: number, prompt: string): string => {
-  const colors = ["#1a1f2e", "#2d3748", "#4a5568", "#718096"];
-  const canvas = document.createElement("canvas");
-  canvas.width = 800;
-  canvas.height = 600;
-  const ctx = canvas.getContext("2d");
-  
-  if (ctx) {
-    // Background gradient
-    const gradient = ctx.createLinearGradient(0, 0, 800, 600);
-    gradient.addColorStop(0, colors[index % colors.length]);
-    gradient.addColorStop(1, colors[(index + 1) % colors.length]);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 800, 600);
-    
-    // Add some decorative elements
-    ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.beginPath();
-    ctx.arc(400, 300, 200, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Text
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 32px system-ui";
-    ctx.textAlign = "center";
-    ctx.fillText(`AI Generated Layout ${index + 1}`, 400, 280);
-    
-    ctx.font = "18px system-ui";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.fillText(prompt || "Event Design Variation", 400, 320);
-    
-    ctx.font = "14px system-ui";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.fillText("(Mock image - Gemini API will replace this)", 400, 360);
-  }
-  
-  return canvas.toDataURL("image/png");
-};
+// Gemini REST endpoint for image generation / editing.
+// Check docs for the latest image model name – this uses a 2.5 Flash Image preview model. :contentReference[oaicite:0]{index=0}
+const GEMINI_ENDPOINT =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent";
 
-export const generateLayout = async (
-  request: GenerateLayoutRequest
-): Promise<GenerateLayoutResponse> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  
-  // Generate mock images
-  const images: string[] = [];
-  for (let i = 0; i < request.variations; i++) {
-    images.push(generateMockImage(i, request.prompt));
+export const generateLayout = async (request: GenerateLayoutRequest): Promise<GenerateLayoutResponse> => {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing VITE_GEMINI_API_KEY env variable");
   }
-  
+
+  const { imageBase64, prompt, variations } = request;
+
+  // Safety clamp: 1–4 images
+  const candidateCount = Math.min(Math.max(variations || 1, 1), 4);
+
+  // Build prompt text – you can tune this for your vibe
+  const textPrompt =
+    prompt?.trim() ||
+    "Using this canvas layout, generate a clean, realistic wedding stage mockup suitable for a South Asian wedding decor business.";
+
+  const body = {
+    contents: [
+      {
+        parts: [
+          { text: textPrompt },
+          {
+            inline_data: {
+              mime_type: "image/png",
+              data: imageBase64, // this is base64 only, no prefix
+            },
+          },
+        ],
+      },
+    ],
+    generationConfig: {
+      candidateCount,
+      // You can tune more here: temperature, etc.
+    },
+  };
+
+  const res = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Gemini error:", text);
+    throw new Error("Gemini API error");
+  }
+
+  const json = await res.json();
+
+  const images: string[] = [];
+
+  // Extract inline image data from candidates :contentReference[oaicite:1]{index=1}
+  for (const candidate of json.candidates ?? []) {
+    for (const part of candidate.content?.parts ?? []) {
+      if (part.inline_data?.data) {
+        const mime = part.inline_data.mime_type || "image/png";
+        const dataUrl = `data:${mime};base64,${part.inline_data.data}`;
+        images.push(dataUrl);
+      }
+    }
+  }
+
+  if (images.length === 0) {
+    throw new Error("Gemini returned no images");
+  }
+
   return { images };
 };
