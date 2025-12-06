@@ -76,7 +76,7 @@ const Canvas = () => {
   };
 
 
-  const handleAiGenerate = async (prompt: string, variations: number) => {
+  const handleAiGenerate = async (vibeText: string, variations: number) => {
     if (!stageRef.current) return;
 
     setIsGenerating(true);
@@ -85,10 +85,41 @@ const Canvas = () => {
       const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 });
       const base64 = dataUrl.split(",")[1];
 
-      // Format the prompt for image generation
-      const formattedPrompt = prompt.trim()
-        ? `Generate an image of a ${prompt} decor set up, adhering to the items shown in the attached image`
-        : "Generate an image of a decor set up, adhering to the items shown in the attached image";
+      // Generate inventory summary from canvas items
+      const itemCounts = items.reduce((acc, item) => {
+        acc[item.name] = (acc[item.name] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      const inventoryText = Object.entries(itemCounts)
+        .map(([name, count]) => count > 1 ? `${count}x ${name}` : name)
+        .join(", ") || "Mixed decor elements";
+
+      // Construct the full prompt with the new wrapper
+      const formattedPrompt = `Generate a clean, professional indoor wedding stage mockup using the provided layout as reference.
+
+Camera and framing:
+- Wide, front-facing angle
+- Eye-level perspective
+- Straight-on shot, centered on the stage
+- Entire decor setup visible in the frame
+
+Overall positioning:
+- Primary seating centered on the stage
+- Supporting decor arranged evenly or symmetrically around the center
+- Vertical decor elements placed behind the seating
+- Floor-level decor placed near the base of seating and backdrop elements
+
+Use only decor represented by the selected inventory and keep the composition balanced and cohesive.
+Avoid extreme angles, heavy zooms, or off-center compositions.
+
+Selected inventory:
+${inventoryText}
+
+Client vibe / styling preferences:
+${vibeText.trim() || "Elegant and balanced"}
+
+Focus on spacing, balance, and a polished event-ready presentation.`;
 
       const response = await generateLayout({
         imageBase64: base64,
