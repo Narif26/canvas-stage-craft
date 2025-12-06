@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAiResults } from "@/contexts/AiResultsContext";
-import { ArrowLeft, Download, Sparkles } from "lucide-react";
-import { toast } from "sonner";
+import { ArrowLeft, Sparkles } from "lucide-react";
 
 const AiResults = () => {
   const navigate = useNavigate();
@@ -14,16 +13,6 @@ const AiResults = () => {
       navigate("/canvas");
     }
   }, [aiImages, navigate]);
-
-  const handleDownload = (imageUrl: string, index: number) => {
-    const link = document.createElement("a");
-    link.href = imageUrl;
-    link.download = `ai-layout-variation-${index + 1}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success(`Downloaded variation ${index + 1}`);
-  };
 
   const handleBackToCanvas = () => {
     clearAiImages();
@@ -80,15 +69,8 @@ const AiResults = () => {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <div className="p-4 flex items-center justify-between">
+              <div className="p-4">
                 <span className="font-medium">Variation {index + 1}</span>
-                <Button
-                  onClick={() => handleDownload(image, index)}
-                  variant="outline"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download PNG
-                </Button>
               </div>
             </div>
           ))}
