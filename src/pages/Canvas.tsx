@@ -40,7 +40,7 @@ const Canvas = () => {
   const handleItemsChange = (newItems: CanvasItem[]) => {
     setItems(newItems);
     sessionStorage.setItem("canvasItems", JSON.stringify(newItems));
-
+    
     // Add to history
     const newHistory = history.slice(0, historyStep + 1);
     newHistory.push(newItems);
@@ -77,7 +77,7 @@ const Canvas = () => {
 
   const handleExport = () => {
     if (!stageRef.current) return;
-
+    
     const uri = stageRef.current.toDataURL({ pixelRatio: 2 });
     sessionStorage.setItem("exportedCanvas", uri);
     toast.success("Layout exported!");
@@ -90,8 +90,8 @@ const Canvas = () => {
     setIsGenerating(true);
 
     try {
-      const dataUrl = stageRef.current.toDataURL({ mimeType: "image/png" });
-      const base64 = dataUrl.split(",")[1]; //
+      const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 });
+      const base64 = dataUrl.split(",")[1];
 
       const response = await generateLayout({
         imageBase64: base64,
@@ -120,12 +120,18 @@ const Canvas = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <Button variant="ghost" onClick={() => navigate("/inventory")} className="mb-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/inventory")}
+              className="mb-4"
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Inventory
             </Button>
             <h1 className="text-4xl font-bold">Design Canvas</h1>
-            <p className="text-muted-foreground mt-2">Drag, resize, and arrange your items</p>
+            <p className="text-muted-foreground mt-2">
+              Drag, resize, and arrange your items
+            </p>
           </div>
         </div>
 
@@ -145,18 +151,28 @@ const Canvas = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Canvas */}
           <div className="flex-1 flex justify-center">
-            <CanvasEditor items={items} onItemsChange={handleItemsChange} stageRef={stageRef} />
+            <CanvasEditor
+              items={items}
+              onItemsChange={handleItemsChange}
+              stageRef={stageRef}
+            />
           </div>
 
           {/* AI Generation Panel */}
           <div className="lg:w-80">
-            <AiGenerationPanel onGenerate={handleAiGenerate} isGenerating={isGenerating} hasItems={items.length > 0} />
+            <AiGenerationPanel
+              onGenerate={handleAiGenerate}
+              isGenerating={isGenerating}
+              hasItems={items.length > 0}
+            />
           </div>
         </div>
 
         {items.length === 0 && (
           <div className="text-center mt-8">
-            <p className="text-muted-foreground">No items on canvas yet. Go back to inventory to add items.</p>
+            <p className="text-muted-foreground">
+              No items on canvas yet. Go back to inventory to add items.
+            </p>
           </div>
         )}
       </div>
