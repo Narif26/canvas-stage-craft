@@ -1,64 +1,83 @@
 interface GenerateLayoutRequest {
-  imageBase64: string;
+  imageBase64: string; // base64 without data: prefix
   prompt: string;
-  variations: number;
+  variations: number; // will ignore for now, always 1 image
 }
 
 interface GenerateLayoutResponse {
-  images: string[];
+  images: string[]; // data URLs the frontend can render
 }
 
-// Mock placeholder image generator
-const generateMockImage = (index: number, prompt: string): string => {
-  const colors = ["#1a1f2e", "#2d3748", "#4a5568", "#718096"];
-  const canvas = document.createElement("canvas");
-  canvas.width = 800;
-  canvas.height = 600;
-  const ctx = canvas.getContext("2d");
-  
-  if (ctx) {
-    // Background gradient
-    const gradient = ctx.createLinearGradient(0, 0, 800, 600);
-    gradient.addColorStop(0, colors[index % colors.length]);
-    gradient.addColorStop(1, colors[(index + 1) % colors.length]);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 800, 600);
-    
-    // Add some decorative elements
-    ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.beginPath();
-    ctx.arc(400, 300, 200, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Text
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 32px system-ui";
-    ctx.textAlign = "center";
-    ctx.fillText(`AI Generated Layout ${index + 1}`, 400, 280);
-    
-    ctx.font = "18px system-ui";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.fillText(prompt || "Event Design Variation", 400, 320);
-    
-    ctx.font = "14px system-ui";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.fillText("(Mock image - Gemini API will replace this)", 400, 360);
+const GEMINI_ENDPOINT =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent";
+
+// Helper to call Gemini and get a single base64 image back
+const callGeminiImage = async (imageBase64: string, prompt: string): Promise<string> => {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+
+  if (!apiKey) {
+    throw new Error("VITE_GEMINI_API_KEY is not set");
   }
-  
-  return canvas.toDataURL("image/png");
+
+  const textPrompt =
+    prompt?.trim() ||
+    "Using this layout, generate a clean, professional wedding stage mockup suitable for a South Asian wedding.";
+
+  const body = {
+    contents: [
+      {
+        parts: [
+          { text: textPrompt },
+          {
+            inline_data: {
+              mime_type: "image/png",
+              data: imageBase64, // base64 WITHOUT "data:image/png;base64,"
+            },
+          },
+        ],
+      },
+    ],
+    // For now, always generate 1 candidate
+    generationConfig: {
+      candidateCount: 1,
+    },
+  };
+
+  const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Gemini error:", errorText);
+    throw new Error("Gemini API error");
+  }
+
+  const data = await response.json();
+
+  // Try to find the first inline_data image
+  const candidates = data.candidates || [];
+  for (const candidate of candidates) {
+    const parts = candidate.content?.parts || [];
+    for (const part of parts) {
+      if (part.inline_data?.data) {
+        const mime = part.inline_data.mime_type || "image/png";
+        // Return as data URL so the frontend can display directly
+        return `data:${mime};base64,${part.inline_data.data}`;
+      }
+    }
+  }
+
+  throw new Error("No image returned from Gemini");
 };
 
-export const generateLayout = async (
-  request: GenerateLayoutRequest
-): Promise<GenerateLayoutResponse> => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  
-  // Generate mock images
-  const images: string[] = [];
-  for (let i = 0; i < request.variations; i++) {
-    images.push(generateMockImage(i, request.prompt));
-  }
-  
-  return { images };
+export const generateLayout = async (request: GenerateLayoutRequest): Promise<GenerateLayoutResponse> => {
+  // For now ignore request.variations and just get 1 image
+  const image = await callGeminiImage(request.imageBase64, request.prompt);
+
+  return { images: [image] };
 };
