@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Stage, Layer, Image as KonvaImage, Transformer } from "react-konva";
+import { Stage, Layer, Image as KonvaImage, Transformer, Rect } from "react-konva";
 import Konva from "konva";
 import useImage from "use-image";
-import canvasBackground from "@/assets/canvas_background.png";
 
 interface CanvasItem {
   canvasId: string;
@@ -92,10 +91,6 @@ interface CanvasEditorProps {
   stageRef: React.RefObject<Konva.Stage>;
 }
 
-const BackgroundImage = ({ width, height }: { width: number; height: number }) => {
-  const [image] = useImage(canvasBackground, "anonymous");
-  return <KonvaImage image={image} x={0} y={0} width={width} height={height} listening={false} />;
-};
 
 export const CanvasEditor = ({ items, onItemsChange, stageRef }: CanvasEditorProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -129,7 +124,7 @@ export const CanvasEditor = ({ items, onItemsChange, stageRef }: CanvasEditorPro
         className="bg-white"
       >
         <Layer>
-          <BackgroundImage width={1200} height={800} />
+          <Rect x={0} y={0} width={1200} height={800} fill="#ffffff" listening={false} />
           {items.map((item) => (
             <CanvasImageComponent
               key={item.canvasId}
