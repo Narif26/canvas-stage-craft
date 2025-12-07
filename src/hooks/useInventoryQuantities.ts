@@ -13,7 +13,7 @@ const STORAGE_KEY = "inventoryQuantities";
 const SELECTED_CATEGORIES_KEY = "selectedCategories";
 
 // Categories that only allow 1 selection
-const SINGLE_SELECT_CATEGORIES: InventoryCategory[] = ["Backdrops", "Sofas"];
+const SINGLE_SELECT_CATEGORIES: InventoryCategory[] = ["Sofas"];
 
 const getInitialQuantities = (): QuantityState => {
   const stored = sessionStorage.getItem(STORAGE_KEY);
@@ -74,6 +74,52 @@ export const useInventoryQuantities = () => {
     }
   };
 
+  const incrementQuantity = (itemId: string, category: InventoryCategory) => {
+    const item = inventoryData.find(i => i.id === itemId);
+    if (!item) return;
+
+    setQuantities((prev) => ({
+      ...prev,
+      [itemId]: Math.min(item.quantity, (prev[itemId] || 0) + 1),
+    }));
+
+    // Check if quantity is now back to original, clear selection for single-select categories
+    if (SINGLE_SELECT_CATEGORIES.includes(category)) {
+      const newQuantity = Math.min(item.quantity, (quantities[itemId] || 0) + 1);
+      if (newQuantity === item.quantity) {
+        setSelectedCategories((prev) => {
+          const updated = { ...prev };
+          if (updated[category] === itemId) {
+            delete updated[category];
+          }
+          return updated;
+        });
+      }
+    }
+  };
+
+  const unselectItem = (itemId: string, category: InventoryCategory) => {
+    const item = inventoryData.find(i => i.id === itemId);
+    if (!item) return;
+
+    // Restore quantity back to original
+    setQuantities((prev) => ({
+      ...prev,
+      [itemId]: item.quantity,
+    }));
+
+    // Clear category selection if this was the selected item
+    if (SINGLE_SELECT_CATEGORIES.includes(category)) {
+      setSelectedCategories((prev) => {
+        const updated = { ...prev };
+        if (updated[category] === itemId) {
+          delete updated[category];
+        }
+        return updated;
+      });
+    }
+  };
+
   const resetQuantities = () => {
     const initial: QuantityState = {};
     inventoryData.forEach((item) => {
@@ -87,6 +133,12 @@ export const useInventoryQuantities = () => {
 
   const getAvailableQuantity = (itemId: string): number => {
     return quantities[itemId] ?? 0;
+  };
+
+  const isItemSelected = (itemId: string): boolean => {
+    const item = inventoryData.find(i => i.id === itemId);
+    if (!item) return false;
+    return quantities[itemId] < item.quantity;
   };
 
   const isCategoryLocked = (category: InventoryCategory, itemId: string): boolean => {
@@ -106,8 +158,11 @@ export const useInventoryQuantities = () => {
     quantities,
     selectedCategories,
     decrementQuantity,
+    incrementQuantity,
+    unselectItem,
     resetQuantities,
     getAvailableQuantity,
+    isItemSelected,
     isCategoryLocked,
     getCategoryLockMessage,
   };

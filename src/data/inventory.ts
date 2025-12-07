@@ -13,7 +13,7 @@ import rectangleFlowerArch2Img from "@/assets/rectangle_flower_arch2.png";
 import roundBackdropImg from "@/assets/round_backdrop.png";
 import sideChairImg from "@/assets/side_chair.png";
 
-export type InventoryCategory = "Backdrops" | "Sofas" | "Chairs" | "Flowers" | "Props" | "Lighting";
+export type InventoryCategory = "Backdrops" | "Drapes" | "Sofas" | "Chairs" | "Flowers" | "Accessories" | "Lighting" | "Flooring/Rugs" | "Pillows";
 
 export interface InventoryItem {
   id: string;
@@ -24,19 +24,12 @@ export interface InventoryItem {
 }
 
 export const inventoryData: InventoryItem[] = [
-  // Backdrops
+  // Backdrops (arches only)
   {
     id: "backdrop-1",
     name: "Colorful Arch",
     category: "Backdrops",
     image: colorfulArchImg,
-    quantity: 1,
-  },
-  {
-    id: "backdrop-2",
-    name: "Pink Curtain",
-    category: "Backdrops",
-    image: pinkCurtainImg,
     quantity: 1,
   },
   {
@@ -75,6 +68,15 @@ export const inventoryData: InventoryItem[] = [
     quantity: 1,
   },
   
+  // Drapes
+  {
+    id: "drape-1",
+    name: "Pink Curtain",
+    category: "Drapes",
+    image: pinkCurtainImg,
+    quantity: 1,
+  },
+  
   // Sofas
   {
     id: "sofa-1",
@@ -109,28 +111,7 @@ export const inventoryData: InventoryItem[] = [
   
   // Flowers - empty, add your own items
   
-  // Props
-  {
-    id: "prop-1",
-    name: "Gold Frame Mirror",
-    category: "Props",
-    image: "https://images.unsplash.com/photo-1618220179428-22790b461013?w=400&h=400&fit=crop",
-    quantity: 1,
-  },
-  {
-    id: "prop-2",
-    name: "Vintage Ladder",
-    category: "Props",
-    image: "https://images.unsplash.com/photo-1587582423116-ec07293f0395?w=400&h=400&fit=crop",
-    quantity: 1,
-  },
-  {
-    id: "prop-3",
-    name: "Decorative Vases",
-    category: "Props",
-    image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&h=400&fit=crop",
-    quantity: 1,
-  },
+  // Accessories - empty after removing items
   
   // Lighting
   {
@@ -145,7 +126,7 @@ export const inventoryData: InventoryItem[] = [
     name: "Chandelier",
     category: "Lighting",
     image: chandelierImg,
-    quantity: 1,
+    quantity: 3,
   },
   {
     id: "light-3",
@@ -154,13 +135,20 @@ export const inventoryData: InventoryItem[] = [
     image: uplightImg,
     quantity: 1,
   },
+  
+  // Flooring/Rugs - empty, add your own items
+  
+  // Pillows - empty, add your own items
 ];
 
 export const categories: InventoryCategory[] = [
   "Backdrops",
+  "Drapes",
   "Sofas", 
   "Chairs",
   "Flowers",
-  "Props",
+  "Accessories",
   "Lighting",
+  "Flooring/Rugs",
+  "Pillows",
 ];

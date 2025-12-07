@@ -11,7 +11,9 @@ const Inventory = () => {
   const { 
     quantities, 
     decrementQuantity, 
+    unselectItem,
     getAvailableQuantity,
+    isItemSelected,
     isCategoryLocked,
     getCategoryLockMessage 
   } = useInventoryQuantities();
@@ -52,6 +54,26 @@ const Inventory = () => {
     toast.success(`${item.name} added to canvas!`);
   };
 
+  const handleUnselect = (item: InventoryItem) => {
+    // Remove all instances of this item from canvas
+    const existingItems = sessionStorage.getItem("canvasItems");
+    const items = existingItems ? JSON.parse(existingItems) : [];
+    const filteredItems = items.filter((i: any) => !i.id.startsWith(item.id.split('-')[0]) || i.id !== item.id);
+    
+    // Actually filter by the item's base id
+    const updatedItems = items.filter((i: any) => {
+      // canvasId is like "sofa-1-1234567890", item.id is "sofa-1"
+      return !i.canvasId.startsWith(item.id);
+    });
+    
+    sessionStorage.setItem("canvasItems", JSON.stringify(updatedItems));
+    
+    // Restore quantity and clear locks
+    unselectItem(item.id, item.category);
+    
+    toast.success(`${item.name} removed from selection`);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -84,8 +106,10 @@ const Inventory = () => {
 
         {/* Inventory List */}
         <InventoryList 
-          onAddToCanvas={handleAddToCanvas} 
+          onAddToCanvas={handleAddToCanvas}
+          onUnselect={handleUnselect}
           quantities={quantities}
+          isItemSelected={isItemSelected}
           isCategoryLocked={isCategoryLocked}
           getCategoryLockMessage={getCategoryLockMessage}
         />

@@ -8,7 +8,7 @@ import { ArrowLeft, Sparkles, PenLine } from "lucide-react";
 const AiResults = () => {
   const navigate = useNavigate();
   const { aiImages, clearAiImages } = useAiResults();
-  const [touchupTexts, setTouchupTexts] = useState<Record<number, string>>({});
+  const [touchupText, setTouchupText] = useState("");
 
   useEffect(() => {
     if (aiImages.length === 0) {
@@ -42,9 +42,9 @@ const AiResults = () => {
             <div className="flex items-center gap-3">
               <Sparkles className="w-8 h-8 text-primary" />
               <div>
-                <h1 className="text-4xl font-bold">AI Generated Layouts</h1>
+                <h1 className="text-4xl font-bold">AI Generated Layout</h1>
                 <p className="text-muted-foreground mt-1">
-                  {aiImages.length} variation{aiImages.length > 1 ? "s" : ""} generated based on your design
+                  Your design generated based on your layout
                 </p>
               </div>
             </div>
@@ -58,39 +58,27 @@ const AiResults = () => {
             Return to Canvas
           </Button>
         </div>
-        {/* Results Grid */}
-        <div
-          className={`grid gap-6 ${
-            aiImages.length === 1
-              ? "grid-cols-1 max-w-2xl mx-auto"
-              : aiImages.length === 2
-              ? "grid-cols-1 md:grid-cols-2"
-              : "grid-cols-1 md:grid-cols-2"
-          }`}
-        >
-          {aiImages.map((image, index) => (
-            <div
-              key={index}
-              className="bg-card border border-border rounded-xl overflow-hidden shadow-lg"
-            >
-              <div className="aspect-[4/3] relative overflow-hidden bg-muted">
-                <img
-                  src={image}
-                  alt={`AI Generated Layout ${index + 1}`}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="p-4">
-                <Textarea
-                  placeholder="Describe any touchups or changes you'd like to make to this layout..."
-                  value={touchupTexts[index] || ""}
-                  onChange={(e) => setTouchupTexts(prev => ({ ...prev, [index]: e.target.value }))}
-                  className="resize-none"
-                  rows={3}
-                />
-              </div>
+
+        {/* Result */}
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-lg">
+            <div className="aspect-[4/3] relative overflow-hidden bg-muted">
+              <img
+                src={aiImages[0]}
+                alt="AI Generated Layout"
+                className="w-full h-full object-contain"
+              />
             </div>
-          ))}
+            <div className="p-4">
+              <Textarea
+                placeholder="Describe any touchups or changes you'd like to make to this layout..."
+                value={touchupText}
+                onChange={(e) => setTouchupText(e.target.value)}
+                className="resize-none"
+                rows={3}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Actions */}

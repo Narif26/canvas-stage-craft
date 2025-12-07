@@ -2,17 +2,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Sparkles, Loader2 } from "lucide-react";
 
 interface AiGenerationPanelProps {
-  onGenerate: (prompt: string, variations: number) => void;
+  onGenerate: (prompt: string) => void;
   isGenerating: boolean;
   hasItems: boolean;
 }
@@ -23,10 +16,9 @@ export const AiGenerationPanel = ({
   hasItems,
 }: AiGenerationPanelProps) => {
   const [prompt, setPrompt] = useState("");
-  const [variations, setVariations] = useState("2");
 
   const handleGenerate = () => {
-    onGenerate(prompt, parseInt(variations));
+    onGenerate(prompt);
   };
 
   return (
@@ -49,25 +41,6 @@ export const AiGenerationPanel = ({
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="variations">Number of variations</Label>
-          <Select
-            value={variations}
-            onValueChange={setVariations}
-            disabled={isGenerating}
-          >
-            <SelectTrigger id="variations">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">1 variation</SelectItem>
-              <SelectItem value="2">2 variations</SelectItem>
-              <SelectItem value="3">3 variations</SelectItem>
-              <SelectItem value="4">4 variations</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         <Button
           onClick={handleGenerate}
           disabled={isGenerating || !hasItems}
@@ -77,12 +50,12 @@ export const AiGenerationPanel = ({
           {isGenerating ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Generating AI layouts...
+              Generating your design...
             </>
           ) : (
             <>
               <Sparkles className="w-4 h-4 mr-2" />
-              Generate with AI
+              Generate your Design
             </>
           )}
         </Button>

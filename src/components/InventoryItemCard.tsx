@@ -1,23 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Lock } from "lucide-react";
+import { Plus, Lock, X } from "lucide-react";
 import { InventoryItem } from "@/data/inventory";
 
 interface InventoryItemCardProps {
   item: InventoryItem;
   availableQuantity: number;
   isCategoryLocked: boolean;
+  isSelected: boolean;
   lockMessage?: string;
   onAddToCanvas: (item: InventoryItem) => void;
+  onUnselect: (item: InventoryItem) => void;
 }
 
 export const InventoryItemCard = ({ 
   item, 
   availableQuantity, 
   isCategoryLocked,
+  isSelected,
   lockMessage,
-  onAddToCanvas 
+  onAddToCanvas,
+  onUnselect
 }: InventoryItemCardProps) => {
   const isOutOfStock = availableQuantity <= 0;
   const isDisabled = isOutOfStock || isCategoryLocked;
@@ -26,6 +30,8 @@ export const InventoryItemCard = ({
     <Card className={`group transition-all duration-300 overflow-hidden border-2 ${
       isCategoryLocked 
         ? 'opacity-60 border-muted' 
+        : isSelected
+        ? 'border-primary shadow-lg'
         : 'hover:shadow-lg hover:border-accent/50'
     }`}>
       <CardContent className="p-0">
@@ -63,24 +69,36 @@ export const InventoryItemCard = ({
             </div>
           </div>
           
-          <Button
-            onClick={() => onAddToCanvas(item)}
-            className="w-full"
-            size="sm"
-            disabled={isDisabled}
-          >
-            {isCategoryLocked ? (
-              <>
-                <Lock className="w-4 h-4 mr-2" />
-                Locked
-              </>
-            ) : (
-              <>
-                <Plus className="w-4 h-4 mr-2" />
-                {isOutOfStock ? "Out of Stock" : "Add to Canvas"}
-              </>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => onAddToCanvas(item)}
+              className="flex-1"
+              size="sm"
+              disabled={isDisabled}
+            >
+              {isCategoryLocked ? (
+                <>
+                  <Lock className="w-4 h-4 mr-2" />
+                  Locked
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" />
+                  {isOutOfStock ? "Out of Stock" : "Add to Canvas"}
+                </>
+              )}
+            </Button>
+            {isSelected && !isCategoryLocked && (
+              <Button
+                onClick={() => onUnselect(item)}
+                size="sm"
+                variant="outline"
+                className="shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </Button>
             )}
-          </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
