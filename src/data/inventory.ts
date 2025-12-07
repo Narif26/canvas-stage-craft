@@ -6,7 +6,7 @@ import pinkCurtainImg from "@/assets/pink_curtain.png";
 import midSizeSofaImg from "@/assets/mid_size_sofa.png";
 import smallSofaImg from "@/assets/small_sofa.png";
 import smallBenchImg from "@/assets/small_bench.png";
-import colorfulArch2Img from "@/assets/colorful_arch_2.png";
+
 import goldBackdropImg from "@/assets/gold_backdrop.png";
 import rectangleFlowerArchImg from "@/assets/rectangle_flower_arch.png";
 import rectangleFlowerArch2Img from "@/assets/rectangle_flower_arch2.png";
@@ -30,13 +30,6 @@ export const inventoryData: InventoryItem[] = [
     name: "Colorful Arch",
     category: "Backdrops",
     image: colorfulArchImg,
-    quantity: 1,
-  },
-  {
-    id: "backdrop-3",
-    name: "Colorful Curtain Arch",
-    category: "Backdrops",
-    image: colorfulArch2Img,
     quantity: 1,
   },
   {
