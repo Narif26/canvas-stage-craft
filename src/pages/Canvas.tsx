@@ -95,7 +95,7 @@ const Canvas = () => {
   };
 
 
-  const handleAiGenerate = async (vibeText: string, variations: number) => {
+  const handleAiGenerate = async (vibeText: string) => {
     if (!stageRef.current) return;
 
     setIsGenerating(true);
@@ -143,19 +143,19 @@ Focus on spacing, balance, and a polished event-ready presentation.`;
       const response = await generateLayout({
         imageBase64: base64,
         prompt: formattedPrompt,
-        variations,
+        variations: 1,
       });
 
       if (response.images.length > 0) {
         setAiImages(response.images);
-        toast.success("AI layouts generated!");
+        toast.success("Design generated!");
         navigate("/ai-results");
       } else {
-        toast.error("No images were generated. Please try again.");
+        toast.error("No image was generated. Please try again.");
       }
     } catch (error) {
       console.error("AI generation error:", error);
-      toast.error("Failed to generate AI layouts. Please try again.");
+      toast.error("Failed to generate design. Please try again.");
     } finally {
       setIsGenerating(false);
     }

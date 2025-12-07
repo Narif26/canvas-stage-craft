@@ -7,14 +7,18 @@ import { QuantityState } from "@/hooks/useInventoryQuantities";
 
 interface InventoryListProps {
   onAddToCanvas: (item: InventoryItem) => void;
+  onUnselect: (item: InventoryItem) => void;
   quantities: QuantityState;
+  isItemSelected: (itemId: string) => boolean;
   isCategoryLocked: (category: InventoryCategory, itemId: string) => boolean;
   getCategoryLockMessage: (category: InventoryCategory) => string;
 }
 
 export const InventoryList = ({ 
   onAddToCanvas, 
+  onUnselect,
   quantities,
+  isItemSelected,
   isCategoryLocked,
   getCategoryLockMessage 
 }: InventoryListProps) => {
@@ -27,7 +31,7 @@ export const InventoryList = ({
   return (
     <div className="space-y-6">
       {/* Category Filter */}
-      <div className="flex items-center gap-2 pb-4 border-b">
+      <div className="flex items-center gap-2 pb-4 border-b flex-wrap">
         <Button
           variant={selectedCategory === null ? "default" : "outline"}
           onClick={() => setSelectedCategory(null)}
@@ -56,8 +60,10 @@ export const InventoryList = ({
                 item={item}
                 availableQuantity={quantities[item.id] ?? item.quantity}
                 isCategoryLocked={isCategoryLocked(item.category, item.id)}
+                isSelected={isItemSelected(item.id)}
                 lockMessage={getCategoryLockMessage(item.category)}
                 onAddToCanvas={onAddToCanvas}
+                onUnselect={onUnselect}
               />
             </div>
           ))}
