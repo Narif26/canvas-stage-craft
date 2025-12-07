@@ -1,13 +1,16 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { InventoryList } from "@/components/InventoryList";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import { InventoryItem } from "@/data/inventory";
 import { toast } from "sonner";
 import { useInventoryQuantities } from "@/hooks/useInventoryQuantities";
+import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
 
 const Inventory = () => {
   const navigate = useNavigate();
+  const [isProcessing, setIsProcessing] = useState(false);
   const { 
     quantities, 
     decrementQuantity, 
@@ -18,7 +21,7 @@ const Inventory = () => {
     getCategoryLockMessage 
   } = useInventoryQuantities();
 
-  const handleAddToCanvas = (item: InventoryItem) => {
+  const handleAddToCanvas = async (item: InventoryItem) => {
     // Check if category is locked for this item
     if (isCategoryLocked(item.category, item.id)) {
       toast.error(getCategoryLockMessage(item.category));
@@ -31,34 +34,53 @@ const Inventory = () => {
       return;
     }
 
-    // Get existing canvas items from sessionStorage
-    const existingItems = sessionStorage.getItem("canvasItems");
-    const items = existingItems ? JSON.parse(existingItems) : [];
-    
-    // Add new item with initial position
-    const newItem = {
-      ...item,
-      canvasId: `${item.id}-${Date.now()}`,
-      x: 100 + Math.random() * 200,
-      y: 100 + Math.random() * 200,
-      scale: 1,
-      rotation: 0,
-    };
-    
-    items.push(newItem);
-    sessionStorage.setItem("canvasItems", JSON.stringify(items));
-    
-    // Decrement the quantity and track category selection
-    decrementQuantity(item.id, item.category);
-    
-    toast.success(`${item.name} added to canvas!`);
+    // Start processing
+    setIsProcessing(true);
+    const loadingToast = toast.loading(`Removing background from ${item.name}...`);
+
+    try {
+      // Load the image
+      const imageElement = await loadImage(item.image);
+      
+      // Remove background
+      const transparentImageUrl = await removeBackground(imageElement);
+
+      // Get existing canvas items from sessionStorage
+      const existingItems = sessionStorage.getItem("canvasItems");
+      const items = existingItems ? JSON.parse(existingItems) : [];
+      
+      // Add new item with transparent image
+      const newItem = {
+        ...item,
+        image: transparentImageUrl, // Use the processed transparent image
+        canvasId: `${item.id}-${Date.now()}`,
+        x: 100 + Math.random() * 200,
+        y: 100 + Math.random() * 200,
+        scale: 1,
+        rotation: 0,
+      };
+      
+      items.push(newItem);
+      sessionStorage.setItem("canvasItems", JSON.stringify(items));
+      
+      // Decrement the quantity and track category selection
+      decrementQuantity(item.id, item.category);
+      
+      toast.dismiss(loadingToast);
+      toast.success(`${item.name} added to canvas!`);
+    } catch (error) {
+      console.error('Failed to process image:', error);
+      toast.dismiss(loadingToast);
+      toast.error(`Failed to process ${item.name}. Please try again.`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleUnselect = (item: InventoryItem) => {
     // Remove all instances of this item from canvas
     const existingItems = sessionStorage.getItem("canvasItems");
     const items = existingItems ? JSON.parse(existingItems) : [];
-    const filteredItems = items.filter((i: any) => !i.id.startsWith(item.id.split('-')[0]) || i.id !== item.id);
     
     // Actually filter by the item's base id
     const updatedItems = items.filter((i: any) => {
@@ -98,9 +120,19 @@ const Inventory = () => {
             size="lg"
             onClick={() => navigate("/canvas")}
             className="shadow-lg"
+            disabled={isProcessing}
           >
-            Go to Canvas
-            <ArrowRight className="w-4 h-4 ml-2" />
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                Go to Canvas
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </>
+            )}
           </Button>
         </div>
 
