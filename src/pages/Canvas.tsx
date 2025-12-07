@@ -115,7 +115,9 @@ const Canvas = () => {
         .join(", ") || "Mixed decor elements";
 
       // Construct the full prompt with the new wrapper
-      const formattedPrompt = `Generate a clean, professional indoor wedding stage mockup using the provided layout as reference.
+      const formattedPrompt = `Generate a clean, professional indoor wedding stage mockup.
+
+IMPORTANT: Use the provided layout image as INSPIRATION only. Generate a beautiful, creative design using the elements and items shown in the image. You do NOT need to adhere closely to the exact layout—instead, keep a general idea of what items are present and their approximate positioning, but BE CREATIVE with the final setup. Feel free to reinterpret spacing, arrangement, and styling to create a more polished and visually appealing result.
 
 Camera and framing:
 - Wide, front-facing angle

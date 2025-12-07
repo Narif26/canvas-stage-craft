@@ -1,6 +1,6 @@
 import stringLightsImg from "@/assets/string_lights.jpg";
 import chandelierImg from "@/assets/chandelier.jpg";
-import uplightImg from "@/assets/uplight.jpg";
+
 import colorfulArchImg from "@/assets/colorful_arch.png";
 import pinkCurtainImg from "@/assets/pink_curtain.png";
 import midSizeSofaImg from "@/assets/mid_size_sofa.png";
@@ -120,13 +120,6 @@ export const inventoryData: InventoryItem[] = [
     category: "Lighting",
     image: chandelierImg,
     quantity: 3,
-  },
-  {
-    id: "light-3",
-    name: "LED Uplights",
-    category: "Lighting",
-    image: uplightImg,
-    quantity: 1,
   },
   
   // Flooring/Rugs - empty, add your own items
