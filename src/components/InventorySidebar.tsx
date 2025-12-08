@@ -7,7 +7,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Menu, ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { inventoryData, categories, InventoryItem, InventoryCategory } from "@/data/inventory";
 import { InventorySidebarItem } from "./InventorySidebarItem";
 import { QuantityState, SelectedCategoriesState } from "@/hooks/useInventoryQuantities";
@@ -57,10 +57,11 @@ export const InventorySidebar = ({
       <SheetTrigger asChild>
         <Button
           variant="outline"
-          size="icon"
-          className="fixed left-4 top-1/2 -translate-y-1/2 z-40 h-12 w-12 rounded-full shadow-lg bg-background border-2"
+          className="fixed left-0 top-1/2 -translate-y-1/2 z-40 h-32 w-8 rounded-r-lg rounded-l-none shadow-lg bg-primary text-primary-foreground border-0 hover:bg-primary/90 hover:text-primary-foreground flex items-center justify-center"
         >
-          <Menu className="h-5 w-5" />
+          <span className="writing-mode-vertical text-sm font-semibold tracking-wider" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>
+            Inventory
+          </span>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[350px] p-0">

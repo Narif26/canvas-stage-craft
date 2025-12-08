@@ -3,7 +3,9 @@ import { CanvasEditor } from "@/components/CanvasEditor";
 import { Toolbar } from "@/components/Toolbar";
 import { AiGenerationPanel } from "@/components/AiGenerationPanel";
 import { InventorySidebar } from "@/components/InventorySidebar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Home } from "lucide-react";
 import { toast } from "sonner";
 import { useAiResults } from "@/contexts/AiResultsContext";
 import { generateLayout } from "@/utils/generateLayoutApi";
@@ -221,6 +223,11 @@ Focus on spacing, balance, and a polished event-ready presentation.`;
               Open the inventory sidebar to add items, then drag and arrange
             </p>
           </div>
+          <Button variant="outline" size="icon" asChild>
+            <Link to="/">
+              <Home className="h-5 w-5" />
+            </Link>
+          </Button>
         </div>
 
         {/* Toolbar */}
