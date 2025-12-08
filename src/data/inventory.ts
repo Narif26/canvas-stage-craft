@@ -80,7 +80,7 @@ export const inventoryData: InventoryItem[] = [
   },
   {
     id: "backdrop-9",
-    name: "Heavy Arch",
+    name: "3 Round Arch",
     category: "Backdrops",
     image: heavyArchImg,
     quantity: 1,

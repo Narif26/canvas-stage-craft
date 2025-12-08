@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
 import { CanvasEditor } from "@/components/CanvasEditor";
 import { Toolbar } from "@/components/Toolbar";
 import { AiGenerationPanel } from "@/components/AiGenerationPanel";
+import { InventorySidebar } from "@/components/InventorySidebar";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAiResults } from "@/contexts/AiResultsContext";
 import { generateLayout } from "@/utils/generateLayoutApi";
-import { inventoryData } from "@/data/inventory";
+import { InventoryItem } from "@/data/inventory";
+import { useInventoryQuantities } from "@/hooks/useInventoryQuantities";
 import Konva from "konva";
 
 interface CanvasItem {
@@ -23,18 +23,6 @@ interface CanvasItem {
   rotation: number;
 }
 
-const QUANTITY_STORAGE_KEY = "inventoryQuantities";
-const SELECTED_CATEGORIES_KEY = "selectedCategories";
-
-const resetInventoryQuantities = () => {
-  const initial: Record<string, number> = {};
-  inventoryData.forEach((item) => {
-    initial[item.id] = item.quantity;
-  });
-  sessionStorage.setItem(QUANTITY_STORAGE_KEY, JSON.stringify(initial));
-  sessionStorage.setItem(SELECTED_CATEGORIES_KEY, JSON.stringify({}));
-};
-
 const Canvas = () => {
   const navigate = useNavigate();
   const stageRef = useRef<Konva.Stage>(null);
@@ -42,6 +30,18 @@ const Canvas = () => {
   const [history, setHistory] = useState<CanvasItem[][]>([]);
   const [historyStep, setHistoryStep] = useState(0);
   const { setAiImages, isGenerating, setIsGenerating } = useAiResults();
+
+  const {
+    quantities,
+    selectedCategories,
+    decrementQuantity,
+    unselectItem,
+    resetQuantities,
+    getAvailableQuantity,
+    isItemSelected,
+    isCategoryLocked,
+    getCategoryLockMessage,
+  } = useInventoryQuantities();
 
   useEffect(() => {
     const savedItems = sessionStorage.getItem("canvasItems");
@@ -55,7 +55,7 @@ const Canvas = () => {
   const handleItemsChange = (newItems: CanvasItem[]) => {
     setItems(newItems);
     sessionStorage.setItem("canvasItems", JSON.stringify(newItems));
-    
+
     // Add to history
     const newHistory = history.slice(0, historyStep + 1);
     newHistory.push(newItems);
@@ -87,13 +87,47 @@ const Canvas = () => {
     const newHistory = [...history, []];
     setHistory(newHistory);
     setHistoryStep(newHistory.length - 1);
-    
+
     // Reset inventory quantities
-    resetInventoryQuantities();
-    
+    resetQuantities();
+
     toast.success("Canvas cleared and inventory reset");
   };
 
+  const handleAddToCanvas = (item: InventoryItem) => {
+    const availableQty = getAvailableQuantity(item.id);
+    if (availableQty <= 0) {
+      toast.error("No more of this item available");
+      return;
+    }
+
+    // Create new canvas item
+    const newCanvasItem: CanvasItem = {
+      canvasId: `${item.id}-${Date.now()}`,
+      name: item.name,
+      image: item.image,
+      x: 150 + Math.random() * 200,
+      y: 150 + Math.random() * 200,
+      scaleX: 0.5,
+      scaleY: 0.5,
+      rotation: 0,
+    };
+
+    const newItems = [...items, newCanvasItem];
+    handleItemsChange(newItems);
+    decrementQuantity(item.id, item.category);
+    toast.success(`Added ${item.name} to canvas`);
+  };
+
+  const handleUnselectItem = (item: InventoryItem) => {
+    // Remove all instances of this item from canvas
+    const newItems = items.filter(
+      (canvasItem) => !canvasItem.canvasId.startsWith(item.id)
+    );
+    handleItemsChange(newItems);
+    unselectItem(item.id, item.category);
+    toast.success(`Removed ${item.name} from canvas`);
+  };
 
   const handleAiGenerate = async (vibeText: string) => {
     if (!stageRef.current) return;
@@ -109,10 +143,11 @@ const Canvas = () => {
         acc[item.name] = (acc[item.name] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      
-      const inventoryText = Object.entries(itemCounts)
-        .map(([name, count]) => count > 1 ? `${count}x ${name}` : name)
-        .join(", ") || "Mixed decor elements";
+
+      const inventoryText =
+        Object.entries(itemCounts)
+          .map(([name, count]) => (count > 1 ? `${count}x ${name}` : name))
+          .join(", ") || "Mixed decor elements";
 
       // Construct the full prompt with the new wrapper
       const formattedPrompt = `Generate a clean, professional indoor wedding stage mockup.
@@ -165,21 +200,25 @@ Focus on spacing, balance, and a polished event-ready presentation.`;
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Inventory Sidebar */}
+      <InventorySidebar
+        quantities={quantities}
+        selectedCategories={selectedCategories}
+        onAddToCanvas={handleAddToCanvas}
+        onUnselect={handleUnselectItem}
+        getAvailableQuantity={getAvailableQuantity}
+        isItemSelected={isItemSelected}
+        isCategoryLocked={isCategoryLocked}
+        getCategoryLockMessage={getCategoryLockMessage}
+      />
+
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/inventory")}
-              className="mb-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Inventory
-            </Button>
             <h1 className="text-4xl font-bold">Design Canvas</h1>
             <p className="text-muted-foreground mt-2">
-              Drag, resize, and arrange your items
+              Open the inventory sidebar to add items, then drag and arrange
             </p>
           </div>
         </div>
@@ -219,7 +258,8 @@ Focus on spacing, balance, and a polished event-ready presentation.`;
         {items.length === 0 && (
           <div className="text-center mt-8">
             <p className="text-muted-foreground">
-              No items on canvas yet. Go back to inventory to add items.
+              No items on canvas yet. Click the menu button on the left to open
+              the inventory.
             </p>
           </div>
         )}
