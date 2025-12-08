@@ -13,6 +13,17 @@ import rectangleFlowerArch2Img from "@/assets/rectangle_flower_arch2.png";
 import roundBackdropImg from "@/assets/round_backdrop.png";
 import sideChairImg from "@/assets/side_chair.png";
 
+import purpleFlowerImg from "@/assets/purple_flower.png";
+import redFlowerImg from "@/assets/red_flower.png";
+import whiteFlowerImg from "@/assets/white_flower.png";
+import pinkOrangeFlowerImg from "@/assets/pink_orange_flower.png";
+
+import roundChairImg from "@/assets/round_chair.png";
+import redMandapImg from "@/assets/red_mandap.png";
+import cakeStandImg from "@/assets/cake_stand.png";
+import heavyArchImg from "@/assets/heavy_arch.png";
+import largeSofaImg from "@/assets/large_sofa.png";
+
 export type InventoryCategory = "Backdrops" | "Drapes" | "Sofas" | "Chairs" | "Flowers" | "Accessories" | "Lighting" | "Flooring/Rugs" | "Pillows";
 
 export interface InventoryItem {
@@ -60,6 +71,20 @@ export const inventoryData: InventoryItem[] = [
     image: roundBackdropImg,
     quantity: 1,
   },
+  {
+    id: "backdrop-8",
+    name: "Red Mandap",
+    category: "Backdrops",
+    image: redMandapImg,
+    quantity: 1,
+  },
+  {
+    id: "backdrop-9",
+    name: "Heavy Arch",
+    category: "Backdrops",
+    image: heavyArchImg,
+    quantity: 1,
+  },
   
   // Drapes
   {
@@ -85,6 +110,13 @@ export const inventoryData: InventoryItem[] = [
     image: smallSofaImg,
     quantity: 1,
   },
+  {
+    id: "sofa-3",
+    name: "Large Sofa",
+    category: "Sofas",
+    image: largeSofaImg,
+    quantity: 1,
+  },
   
   // Chairs
   {
@@ -101,10 +133,52 @@ export const inventoryData: InventoryItem[] = [
     image: sideChairImg,
     quantity: 2,
   },
+  {
+    id: "chair-3",
+    name: "Round Chair",
+    category: "Chairs",
+    image: roundChairImg,
+    quantity: 2,
+  },
   
-  // Flowers - empty, add your own items
+  // Flowers - no quantity limit (99 = unlimited)
+  {
+    id: "flower-1",
+    name: "Purple Flowers",
+    category: "Flowers",
+    image: purpleFlowerImg,
+    quantity: 99,
+  },
+  {
+    id: "flower-2",
+    name: "Red Flowers",
+    category: "Flowers",
+    image: redFlowerImg,
+    quantity: 99,
+  },
+  {
+    id: "flower-3",
+    name: "White Flowers",
+    category: "Flowers",
+    image: whiteFlowerImg,
+    quantity: 99,
+  },
+  {
+    id: "flower-4",
+    name: "Pink & Orange Flowers",
+    category: "Flowers",
+    image: pinkOrangeFlowerImg,
+    quantity: 99,
+  },
   
-  // Accessories - empty after removing items
+  // Accessories
+  {
+    id: "accessory-1",
+    name: "Cake Stand",
+    category: "Accessories",
+    image: cakeStandImg,
+    quantity: 1,
+  },
   
   // Lighting
   {
@@ -119,7 +193,7 @@ export const inventoryData: InventoryItem[] = [
     name: "Chandelier",
     category: "Lighting",
     image: chandelierImg,
-    quantity: 3,
+    quantity: 4,
   },
   
   // Flooring/Rugs - empty, add your own items
