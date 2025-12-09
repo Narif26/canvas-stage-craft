@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { CanvasEditor } from "@/components/CanvasEditor";
+import { CanvasEditor, CanvasItem } from "@/components/CanvasEditor";
 import { Toolbar } from "@/components/Toolbar";
 import { AiGenerationPanel } from "@/components/AiGenerationPanel";
 import { InventorySidebar } from "@/components/InventorySidebar";
@@ -12,18 +12,6 @@ import { generateLayout } from "@/utils/generateLayoutApi";
 import { InventoryItem } from "@/data/inventory";
 import { useInventoryQuantities } from "@/hooks/useInventoryQuantities";
 import Konva from "konva";
-
-interface CanvasItem {
-  canvasId: string;
-  name: string;
-  image: string;
-  x: number;
-  y: number;
-  scale?: number;
-  scaleX?: number;
-  scaleY?: number;
-  rotation: number;
-}
 
 const Canvas = () => {
   const navigate = useNavigate();
@@ -103,16 +91,18 @@ const Canvas = () => {
       return;
     }
 
-    // Create new canvas item
+    // Create new canvas item with category and zIndex
     const newCanvasItem: CanvasItem = {
       canvasId: `${item.id}-${Date.now()}`,
       name: item.name,
       image: item.image,
+      category: item.category,
       x: 150 + Math.random() * 200,
       y: 150 + Math.random() * 200,
       scaleX: 0.5,
       scaleY: 0.5,
       rotation: 0,
+      zIndex: 0,
     };
 
     const newItems = [...items, newCanvasItem];
@@ -129,6 +119,44 @@ const Canvas = () => {
     handleItemsChange(newItems);
     unselectItem(item.id, item.category);
     toast.success(`Removed ${item.name} from canvas`);
+  };
+
+  const handleLayerChange = (id: string, direction: 'up' | 'down' | 'front' | 'back') => {
+    const item = items.find(i => i.canvasId === id);
+    if (!item) return;
+
+    // Get all items in the same layer tier
+    const sameTierItems = items.filter(i => {
+      const thisPriority = getLayerPriorityForCategory(i.category);
+      const targetPriority = getLayerPriorityForCategory(item.category);
+      return thisPriority === targetPriority;
+    });
+
+    let newZIndex = item.zIndex;
+
+    switch (direction) {
+      case 'up':
+        newZIndex = item.zIndex + 1;
+        break;
+      case 'down':
+        newZIndex = item.zIndex - 1;
+        break;
+      case 'front': {
+        const maxZ = Math.max(...sameTierItems.map(i => i.zIndex));
+        newZIndex = maxZ + 1;
+        break;
+      }
+      case 'back': {
+        const minZ = Math.min(...sameTierItems.map(i => i.zIndex));
+        newZIndex = minZ - 1;
+        break;
+      }
+    }
+
+    const newItems = items.map(i =>
+      i.canvasId === id ? { ...i, zIndex: newZIndex } : i
+    );
+    handleItemsChange(newItems);
   };
 
   const handleAiGenerate = async (vibeText: string) => {
@@ -248,6 +276,7 @@ Focus on spacing, balance, and a polished event-ready presentation.`;
             <CanvasEditor
               items={items}
               onItemsChange={handleItemsChange}
+              onLayerChange={handleLayerChange}
               stageRef={stageRef}
             />
           </div>
@@ -273,6 +302,22 @@ Focus on spacing, balance, and a polished event-ready presentation.`;
       </div>
     </div>
   );
+};
+
+// Helper function for layer priority (mirrors the one in CanvasEditor)
+const getLayerPriorityForCategory = (category: string): number => {
+  switch (category) {
+    case "Drapes": return 0;
+    case "Backdrops": return 100;
+    case "Flooring/Rugs": return 150;
+    case "Sofas":
+    case "Chairs":
+    case "Accessories":
+    case "Lighting":
+    case "Pillows": return 200;
+    case "Flowers": return 300;
+    default: return 200;
+  }
 };
 
 export default Canvas;
