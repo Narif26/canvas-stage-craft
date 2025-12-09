@@ -24,6 +24,13 @@ import cakeStandImg from "@/assets/cake_stand.png";
 import heavyArchImg from "@/assets/heavy_arch.png";
 import largeSofaImg from "@/assets/large_sofa.png";
 
+import goldFrameImg from "@/assets/gold_frame.png";
+import goldSquareArchImg from "@/assets/gold_square_arch.png";
+import turkishBackdropImg from "@/assets/turkish_backdrop.png";
+import ledArchImg from "@/assets/led_arch.png";
+import crystalFloralTowerImg from "@/assets/crystal_floral_tower.png";
+import crystalChandelierStandImg from "@/assets/crystal_chandelier_stand.png";
+
 export type InventoryCategory = "Backdrops" | "Drapes" | "Sofas" | "Chairs" | "Flowers" | "Accessories" | "Lighting" | "Flooring/Rugs" | "Pillows";
 
 export interface InventoryItem {
@@ -35,7 +42,7 @@ export interface InventoryItem {
 }
 
 export const inventoryData: InventoryItem[] = [
-  // Backdrops (arches only)
+  // Backdrops (arches and frames)
   {
     id: "backdrop-1",
     name: "Colorful Arch",
@@ -83,6 +90,34 @@ export const inventoryData: InventoryItem[] = [
     name: "3 Round Arch",
     category: "Backdrops",
     image: heavyArchImg,
+    quantity: 1,
+  },
+  {
+    id: "backdrop-10",
+    name: "Gold Frame Arch",
+    category: "Backdrops",
+    image: goldFrameImg,
+    quantity: 1,
+  },
+  {
+    id: "backdrop-11",
+    name: "Gold Square Arch",
+    category: "Backdrops",
+    image: goldSquareArchImg,
+    quantity: 1,
+  },
+  {
+    id: "backdrop-12",
+    name: "Turkish Backdrop",
+    category: "Backdrops",
+    image: turkishBackdropImg,
+    quantity: 1,
+  },
+  {
+    id: "backdrop-13",
+    name: "LED Wave Arch",
+    category: "Backdrops",
+    image: ledArchImg,
     quantity: 1,
   },
   
@@ -178,6 +213,20 @@ export const inventoryData: InventoryItem[] = [
     category: "Accessories",
     image: cakeStandImg,
     quantity: 1,
+  },
+  {
+    id: "accessory-2",
+    name: "Crystal Floral Tower",
+    category: "Accessories",
+    image: crystalFloralTowerImg,
+    quantity: 6,
+  },
+  {
+    id: "accessory-3",
+    name: "Crystal Chandelier Stand",
+    category: "Accessories",
+    image: crystalChandelierStandImg,
+    quantity: 6,
   },
   
   // Lighting
