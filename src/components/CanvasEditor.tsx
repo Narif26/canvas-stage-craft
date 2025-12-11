@@ -27,6 +27,7 @@ const getLayerPriority = (category: InventoryCategory): number => {
     case "Sofas":
     case "Chairs":
     case "Accessories":
+    case "Stands":
     case "Lighting":
     case "Pillows": return 200;        // Middle layer
     case "Flowers": return 300;        // Top layer
