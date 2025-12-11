@@ -3,6 +3,9 @@ import chandelierImg from "@/assets/chandelier.jpg";
 
 import colorfulArchImg from "@/assets/colorful_arch.png";
 import pinkCurtainImg from "@/assets/pink_curtain.png";
+import pinkDrapeImg from "@/assets/pink_drape.png";
+import yellowDrapeImg from "@/assets/yellow_drape.png";
+import orangeDrapeImg from "@/assets/orange_drape.png";
 import midSizeSofaImg from "@/assets/mid_size_sofa.png";
 import smallSofaImg from "@/assets/small_sofa.png";
 import smallBenchImg from "@/assets/small_bench.png";
@@ -17,10 +20,13 @@ import purpleFlowerImg from "@/assets/purple_flower.png";
 import redFlowerImg from "@/assets/red_flower.png";
 import whiteFlowerImg from "@/assets/white_flower.png";
 import pinkOrangeFlowerImg from "@/assets/pink_orange_flower.png";
+import pinkFlowerImg from "@/assets/pink_flower.png";
+import orangeFlowerImg from "@/assets/orange_flower.png";
+import yellowFlowerImg from "@/assets/yellow_flower.png";
+import lightBlueFlowerImg from "@/assets/light_blue_flower.png";
 
 import roundChairImg from "@/assets/round_chair.png";
 import redMandapImg from "@/assets/red_mandap.png";
-import cakeStandImg from "@/assets/cake_stand.png";
 import heavyArchImg from "@/assets/heavy_arch.png";
 import largeSofaImg from "@/assets/large_sofa.png";
 
@@ -30,8 +36,13 @@ import turkishBackdropImg from "@/assets/turkish_backdrop.png";
 import ledArchImg from "@/assets/led_arch.png";
 import crystalFloralTowerImg from "@/assets/crystal_floral_tower.png";
 import crystalChandelierStandImg from "@/assets/crystal_chandelier_stand.png";
+import cakeStandImg from "@/assets/cake_stand.png";
+import hexagonalStandImg from "@/assets/hexagonal_stand.png";
 
-export type InventoryCategory = "Backdrops" | "Drapes" | "Sofas" | "Chairs" | "Flowers" | "Accessories" | "Lighting" | "Flooring/Rugs" | "Pillows";
+import purpleUmbrellaImg from "@/assets/purple_umbrella.png";
+import turkishLampImg from "@/assets/turkish_lamp.png";
+
+export type InventoryCategory = "Backdrops" | "Drapes" | "Sofas" | "Chairs" | "Flowers" | "Accessories" | "Lighting" | "Flooring/Rugs" | "Pillows" | "Stands";
 
 export interface InventoryItem {
   id: string;
@@ -129,6 +140,27 @@ export const inventoryData: InventoryItem[] = [
     image: pinkCurtainImg,
     quantity: 1,
   },
+  {
+    id: "drape-2",
+    name: "Pink Drape",
+    category: "Drapes",
+    image: pinkDrapeImg,
+    quantity: 1,
+  },
+  {
+    id: "drape-3",
+    name: "Yellow Drape",
+    category: "Drapes",
+    image: yellowDrapeImg,
+    quantity: 1,
+  },
+  {
+    id: "drape-4",
+    name: "Orange Drape",
+    category: "Drapes",
+    image: orangeDrapeImg,
+    quantity: 1,
+  },
   
   // Sofas
   {
@@ -205,27 +237,78 @@ export const inventoryData: InventoryItem[] = [
     image: pinkOrangeFlowerImg,
     quantity: 99,
   },
+  {
+    id: "flower-5",
+    name: "Pink Flowers",
+    category: "Flowers",
+    image: pinkFlowerImg,
+    quantity: 99,
+  },
+  {
+    id: "flower-6",
+    name: "Orange Flowers",
+    category: "Flowers",
+    image: orangeFlowerImg,
+    quantity: 99,
+  },
+  {
+    id: "flower-7",
+    name: "Yellow Flowers",
+    category: "Flowers",
+    image: yellowFlowerImg,
+    quantity: 99,
+  },
+  {
+    id: "flower-8",
+    name: "Light Blue Flowers",
+    category: "Flowers",
+    image: lightBlueFlowerImg,
+    quantity: 99,
+  },
   
   // Accessories
   {
     id: "accessory-1",
-    name: "Cake Stand",
+    name: "Purple Umbrella",
     category: "Accessories",
-    image: cakeStandImg,
+    image: purpleUmbrellaImg,
     quantity: 1,
   },
   {
     id: "accessory-2",
-    name: "Crystal Floral Tower",
+    name: "Turkish Lamp",
     category: "Accessories",
+    image: turkishLampImg,
+    quantity: 12,
+  },
+  
+  // Stands
+  {
+    id: "stand-1",
+    name: "Crystal Tower",
+    category: "Stands",
     image: crystalFloralTowerImg,
     quantity: 6,
   },
   {
-    id: "accessory-3",
+    id: "stand-2",
     name: "Crystal Chandelier Stand",
-    category: "Accessories",
+    category: "Stands",
     image: crystalChandelierStandImg,
+    quantity: 6,
+  },
+  {
+    id: "stand-3",
+    name: "Cake Stand",
+    category: "Stands",
+    image: cakeStandImg,
+    quantity: 1,
+  },
+  {
+    id: "stand-4",
+    name: "Hexagonal Stand",
+    category: "Stands",
+    image: hexagonalStandImg,
     quantity: 6,
   },
   
@@ -257,6 +340,7 @@ export const categories: InventoryCategory[] = [
   "Chairs",
   "Flowers",
   "Accessories",
+  "Stands",
   "Lighting",
   "Flooring/Rugs",
   "Pillows",
