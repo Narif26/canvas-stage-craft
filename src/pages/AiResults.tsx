@@ -3,12 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAiResults } from "@/contexts/AiResultsContext";
-import { ArrowLeft, Sparkles, PenLine } from "lucide-react";
+import { Sparkles, PenLine, Loader2 } from "lucide-react";
+import { generateTouchup } from "@/utils/generateLayoutApi";
+import { useToast } from "@/hooks/use-toast";
 
 const AiResults = () => {
   const navigate = useNavigate();
-  const { aiImages, clearAiImages } = useAiResults();
+  const { aiImages, setAiImages, clearAiImages } = useAiResults();
   const [touchupText, setTouchupText] = useState("");
+  const [isTouchingUp, setIsTouchingUp] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (aiImages.length === 0) {
@@ -21,6 +25,45 @@ const AiResults = () => {
     navigate("/canvas");
   };
 
+  const handleTouchup = async () => {
+    if (!touchupText.trim() || !aiImages[0]) return;
+
+    setIsTouchingUp(true);
+    try {
+      // Extract base64 from data URL (remove "data:image/...;base64," prefix)
+      const base64Match = aiImages[0].match(/^data:image\/[^;]+;base64,(.+)$/);
+      if (!base64Match) {
+        throw new Error("Invalid image format");
+      }
+      const imageBase64 = base64Match[1];
+
+      const result = await generateTouchup({
+        imageBase64,
+        touchupChanges: touchupText.trim(),
+      });
+
+      if (result.images && result.images.length > 0) {
+        setAiImages(result.images);
+        setTouchupText("");
+        toast({
+          title: "Touchup applied",
+          description: "Your design has been updated with the requested changes.",
+        });
+      } else {
+        throw new Error("No image returned from touchup");
+      }
+    } catch (error) {
+      console.error("Touchup error:", error);
+      toast({
+        title: "Touchup failed",
+        description: error instanceof Error ? error.message : "Failed to apply touchup",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTouchingUp(false);
+    }
+  };
+
   if (aiImages.length === 0) {
     return null;
   }
@@ -30,23 +73,13 @@ const AiResults = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
-          <div>
-            <Button
-              variant="ghost"
-              onClick={handleBackToCanvas}
-              className="mb-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Canvas
-            </Button>
-            <div className="flex items-center gap-3">
-              <Sparkles className="w-8 h-8 text-primary" />
-              <div>
-                <h1 className="text-4xl font-bold">AI Generated Layout</h1>
-                <p className="text-muted-foreground mt-1">
-                  Your design generated based on your layout
-                </p>
-              </div>
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-8 h-8 text-primary" />
+            <div>
+              <h1 className="text-4xl font-bold">AI Generated Layout</h1>
+              <p className="text-muted-foreground mt-1">
+                Your design generated based on your layout
+              </p>
             </div>
           </div>
           <Button
@@ -63,20 +96,40 @@ const AiResults = () => {
         <div className="max-w-3xl mx-auto">
           <div className="bg-card border border-border rounded-xl overflow-hidden shadow-lg">
             <div className="aspect-[4/3] relative overflow-hidden bg-muted">
+              {isTouchingUp && (
+                <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10">
+                  <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">Applying touchups...</p>
+                  </div>
+                </div>
+              )}
               <img
                 src={aiImages[0]}
                 alt="AI Generated Layout"
                 className="w-full h-full object-contain"
               />
             </div>
-            <div className="p-4">
+            <div className="p-4 flex gap-2 items-start">
               <Textarea
                 placeholder="Describe any touchups or changes you'd like to make to this layout..."
                 value={touchupText}
                 onChange={(e) => setTouchupText(e.target.value)}
-                className="resize-none"
+                className="resize-none flex-1"
                 rows={3}
+                disabled={isTouchingUp}
               />
+              <Button
+                onClick={handleTouchup}
+                disabled={!touchupText.trim() || isTouchingUp}
+                className="shrink-0"
+              >
+                {isTouchingUp ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+              </Button>
             </div>
           </div>
         </div>
