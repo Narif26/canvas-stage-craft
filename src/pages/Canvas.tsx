@@ -13,6 +13,20 @@ import { InventoryItem } from "@/data/inventory";
 import { useInventoryQuantities } from "@/hooks/useInventoryQuantities";
 import Konva from "konva";
 
+// Default scales by category
+const categoryDefaultScales: Record<string, { scaleX: number; scaleY: number }> = {
+  Backdrops: { scaleX: 5.1, scaleY: 3.74 },
+  Drapes: { scaleX: 4.573, scaleY: 3.993 },
+  Sofas: { scaleX: 3.527, scaleY: 2.373 },
+  Chairs: { scaleX: 2.127, scaleY: 1.373 },
+  Flowers: { scaleX: 1.067, scaleY: 0.647 },
+  Accessories: { scaleX: 0.807, scaleY: 0.747 },
+  Stands: { scaleX: 0.993, scaleY: 1.5 },
+  Lighting: { scaleX: 1.14, scaleY: 1.053 },
+  "Flooring/Rugs": { scaleX: 2.0, scaleY: 1.5 },
+  Pillows: { scaleX: 0.8, scaleY: 0.8 },
+};
+
 const Canvas = () => {
   const navigate = useNavigate();
   const stageRef = useRef<Konva.Stage>(null);
@@ -91,6 +105,9 @@ const Canvas = () => {
       return;
     }
 
+    // Get default scale for this category
+    const defaultScale = categoryDefaultScales[item.category] || { scaleX: 1, scaleY: 1 };
+
     // Create new canvas item with category and zIndex
     const newCanvasItem: CanvasItem = {
       canvasId: `${item.id}-${Date.now()}`,
@@ -99,8 +116,8 @@ const Canvas = () => {
       category: item.category,
       x: 150 + Math.random() * 200,
       y: 150 + Math.random() * 200,
-      scaleX: 0.5,
-      scaleY: 0.5,
+      scaleX: defaultScale.scaleX,
+      scaleY: defaultScale.scaleY,
       rotation: 0,
       zIndex: 0,
     };
@@ -157,35 +174,6 @@ const Canvas = () => {
       i.canvasId === id ? { ...i, zIndex: newZIndex } : i
     );
     handleItemsChange(newItems);
-  };
-
-  const handleExportSizes = () => {
-    if (items.length === 0) {
-      toast.error("No items on canvas to export");
-      return;
-    }
-
-    // Group by category and take first item's scale for each
-    const sizesByCategory: Record<string, { scaleX: number; scaleY: number; name: string }> = {};
-    
-    items.forEach(item => {
-      if (!sizesByCategory[item.category]) {
-        sizesByCategory[item.category] = {
-          scaleX: Math.round(item.scaleX * 1000) / 1000,
-          scaleY: Math.round(item.scaleY * 1000) / 1000,
-          name: item.name,
-        };
-      }
-    });
-
-    const output = JSON.stringify(sizesByCategory, null, 2);
-    console.log("=== EXPORTED SIZES ===");
-    console.log(output);
-    
-    // Copy to clipboard
-    navigator.clipboard.writeText(output).then(() => {
-      toast.success("Sizes copied to clipboard! Check console for details.");
-    });
   };
 
   const handleAiGenerate = async (vibeText: string) => {
@@ -293,7 +281,6 @@ Focus on spacing, balance, and a polished event-ready presentation.`;
             onUndo={handleUndo}
             onRedo={handleRedo}
             onClear={handleClear}
-            onExportSizes={handleExportSizes}
             canUndo={historyStep > 0}
             canRedo={historyStep < history.length - 1}
           />
