@@ -18,7 +18,7 @@ const categoryDefaultScales: Record<string, { scaleX: number; scaleY: number }> 
   Backdrops: { scaleX: 5.1, scaleY: 3.74 },
   Drapes: { scaleX: 4.573, scaleY: 3.993 },
   Sofas: { scaleX: 3.527, scaleY: 2.373 },
-  Chairs: { scaleX: 2.127, scaleY: 1.373 },
+  Chairs: { scaleX: 1.8, scaleY: 1.373 },
   Flowers: { scaleX: 1.067, scaleY: 0.647 },
   Accessories: { scaleX: 0.807, scaleY: 0.747 },
   Stands: { scaleX: 0.993, scaleY: 1.5 },

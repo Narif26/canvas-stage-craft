@@ -33,8 +33,9 @@ serve(async (req) => {
       );
     }
 
-    const textPrompt = prompt?.trim() ||
-      "Using this layout, generate a clean, professional wedding stage mockup suitable for a South Asian wedding.";
+    const vibeDescription = prompt?.trim() ? ` The desired vibe is: ${prompt.trim()}.` : "";
+    
+    const textPrompt = `Use this layout image as inspiration to generate a beautiful, professional wedding stage design suitable for a South Asian wedding. You do not need to adhere strictly to the layout - instead, use your creativity to design an elegant setup that incorporates the items and elements shown in the image. Keep the general idea of what items are present and their approximate positions, but feel free to fill in gaps, enhance the composition, and make creative decisions to produce a cohesive, stunning final design.${vibeDescription}`;
 
     console.log("Calling Gemini API with prompt:", textPrompt.substring(0, 100) + "...");
 
