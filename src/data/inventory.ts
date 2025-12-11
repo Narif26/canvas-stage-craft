@@ -40,6 +40,11 @@ import cakeStandImg from "@/assets/cake_stand.png";
 import hexagonalStandImg from "@/assets/hexagonal_stand.png";
 
 import purpleUmbrellaImg from "@/assets/purple_umbrella.png";
+import pinkUmbrellaImg from "@/assets/pink_umbrella.png";
+import orangeUmbrellaImg from "@/assets/orange_umbrella.png";
+import lightBlueUmbrellaImg from "@/assets/light_blue_umbrella.png";
+import greenUmbrellaImg from "@/assets/green_umbrella.png";
+import redUmbrellaImg from "@/assets/red_umbrella.png";
 import turkishLampImg from "@/assets/turkish_lamp.png";
 
 export type InventoryCategory = "Backdrops" | "Drapes" | "Sofas" | "Chairs" | "Flowers" | "Accessories" | "Lighting" | "Flooring/Rugs" | "Pillows" | "Stands";
@@ -272,10 +277,45 @@ export const inventoryData: InventoryItem[] = [
     name: "Purple Umbrella",
     category: "Accessories",
     image: purpleUmbrellaImg,
-    quantity: 1,
+    quantity: 10,
   },
   {
     id: "accessory-2",
+    name: "Pink Umbrella",
+    category: "Accessories",
+    image: pinkUmbrellaImg,
+    quantity: 10,
+  },
+  {
+    id: "accessory-3",
+    name: "Orange Umbrella",
+    category: "Accessories",
+    image: orangeUmbrellaImg,
+    quantity: 10,
+  },
+  {
+    id: "accessory-4",
+    name: "Light Blue Umbrella",
+    category: "Accessories",
+    image: lightBlueUmbrellaImg,
+    quantity: 10,
+  },
+  {
+    id: "accessory-5",
+    name: "Green Umbrella",
+    category: "Accessories",
+    image: greenUmbrellaImg,
+    quantity: 10,
+  },
+  {
+    id: "accessory-6",
+    name: "Red Umbrella",
+    category: "Accessories",
+    image: redUmbrellaImg,
+    quantity: 10,
+  },
+  {
+    id: "accessory-7",
     name: "Turkish Lamp",
     category: "Accessories",
     image: turkishLampImg,
