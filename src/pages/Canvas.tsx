@@ -159,6 +159,35 @@ const Canvas = () => {
     handleItemsChange(newItems);
   };
 
+  const handleExportSizes = () => {
+    if (items.length === 0) {
+      toast.error("No items on canvas to export");
+      return;
+    }
+
+    // Group by category and take first item's scale for each
+    const sizesByCategory: Record<string, { scaleX: number; scaleY: number; name: string }> = {};
+    
+    items.forEach(item => {
+      if (!sizesByCategory[item.category]) {
+        sizesByCategory[item.category] = {
+          scaleX: Math.round(item.scaleX * 1000) / 1000,
+          scaleY: Math.round(item.scaleY * 1000) / 1000,
+          name: item.name,
+        };
+      }
+    });
+
+    const output = JSON.stringify(sizesByCategory, null, 2);
+    console.log("=== EXPORTED SIZES ===");
+    console.log(output);
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(output).then(() => {
+      toast.success("Sizes copied to clipboard! Check console for details.");
+    });
+  };
+
   const handleAiGenerate = async (vibeText: string) => {
     if (!stageRef.current) return;
 
@@ -264,6 +293,7 @@ Focus on spacing, balance, and a polished event-ready presentation.`;
             onUndo={handleUndo}
             onRedo={handleRedo}
             onClear={handleClear}
+            onExportSizes={handleExportSizes}
             canUndo={historyStep > 0}
             canRedo={historyStep < history.length - 1}
           />
