@@ -33,8 +33,16 @@ serve(async (req) => {
       );
     }
 
-    const vibeDescription = prompt?.trim() ? ` The desired vibe is: ${prompt.trim()}.` : "";
-    const textPrompt = `Use this layout image as a reference to generate a beautiful, professional wedding stage design. Incorporate the items and elements shown in the image into an elegant South Asian wedding setup. Feel free to enhance the composition and add creative details.${vibeDescription}`;
+    let textPrompt;
+
+    if (touchupChanges?.trim()) {
+      // TOUCHUP MODE: Keep everything the same, apply specific changes
+      textPrompt = `This is an AI-generated wedding stage design. Keep the overall design, composition, layout, lighting, and style exactly the same. Only make the following specific modifications: ${touchupChanges.trim()}. The result must still look like a real photograph with natural lighting and realistic textures. Preserve everything that is not explicitly mentioned - only change what is specifically requested.`;
+    } else {
+      // INITIAL GENERATION MODE
+      const vibeDescription = prompt?.trim() ? ` The desired vibe is: ${prompt.trim()}.` : "";
+      textPrompt = `Use this layout image as inspiration to generate a realistic, professional wedding stage design suitable for a South Asian wedding. The image must look like a real photograph - with natural lighting, realistic textures, proper shadows, and lifelike materials. You do not need to adhere strictly to the layout - instead, use your creativity to design an elegant setup that incorporates the items and elements shown in the image. Keep the general idea of what items are present and their approximate positions, but feel free to fill in gaps, enhance the composition, and make creative decisions to produce a cohesive, stunning final design that looks like it could be a real photograph of an actual wedding venue.${vibeDescription}`;
+    }
 
     console.log("Calling Gemini API with prompt:", textPrompt.substring(0, 100) + "...");
 
