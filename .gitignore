@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python artifacts for association analysis
+association_analysis/out/
+association_analysis/__pycache__/
+*.pyc
