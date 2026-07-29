@@ -5,8 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const GEMINI_ENDPOINT =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent";
+const AI_ENDPOINT = "https://ai.gateway.lovable.dev/v1/images/generations";
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -17,14 +16,15 @@ serve(async (req) => {
   try {
     const { imageBase64, prompt, variations, touchupChanges } = await req.json();
 
-    const apiKey = Deno.env.get('gemini_api_key');
+    const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {
-      console.error("gemini_api_key is not configured");
+      console.error("LOVABLE_API_KEY is not configured");
       return new Response(
-        JSON.stringify({ error: "API key not configured" }),
+        JSON.stringify({ error: "AI is not configured" }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     if (!imageBase64) {
       return new Response(
