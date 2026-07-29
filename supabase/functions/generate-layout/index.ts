@@ -5,8 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const GEMINI_ENDPOINT =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent";
+const AI_ENDPOINT = "https://ai.gateway.lovable.dev/v1/images/generations";
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -17,14 +16,15 @@ serve(async (req) => {
   try {
     const { imageBase64, prompt, variations, touchupChanges } = await req.json();
 
-    const apiKey = Deno.env.get('gemini_api_key');
+    const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {
-      console.error("gemini_api_key is not configured");
+      console.error("LOVABLE_API_KEY is not configured");
       return new Response(
-        JSON.stringify({ error: "API key not configured" }),
+        JSON.stringify({ error: "AI is not configured" }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     if (!imageBase64) {
       return new Response(
@@ -44,31 +44,29 @@ serve(async (req) => {
       textPrompt = `Use this layout image as inspiration to generate a realistic, professional wedding stage design suitable for a South Asian wedding. The image must look like a real photograph - with natural lighting, realistic textures, proper shadows, and lifelike materials. You do not need to adhere strictly to the layout - instead, use your creativity to design an elegant setup that incorporates the items and elements shown in the image. Keep the general idea of what items are present and their approximate positions, but feel free to fill in gaps, enhance the composition, and make creative decisions to produce a cohesive, stunning final design that looks like it could be a real photograph of an actual wedding venue.${vibeDescription}`;
     }
 
-    console.log("Calling Gemini API with prompt:", textPrompt.substring(0, 100) + "...");
+    console.log("Calling Lovable AI with prompt:", textPrompt.substring(0, 100) + "...");
 
     const body = {
-      contents: [
+      model: "google/gemini-3.1-flash-image",
+      messages: [
         {
-          parts: [
-            { text: textPrompt },
+          role: "user",
+          content: [
+            { type: "text", text: textPrompt },
             {
-              inline_data: {
-                mime_type: "image/png",
-                data: imageBase64,
-              },
+              type: "image_url",
+              image_url: { url: `data:image/png;base64,${imageBase64}` },
             },
           ],
         },
       ],
-      generationConfig: {
-        responseModalities: ["TEXT", "IMAGE"],
-        candidateCount: 1,
-      },
+      modalities: ["image", "text"],
     };
 
-    const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
+    const response = await fetch(AI_ENDPOINT, {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
@@ -76,38 +74,33 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Gemini API error:", response.status, errorText);
+      console.error("AI gateway error:", response.status, errorText);
+      const message =
+        response.status === 429
+          ? "Rate limit reached. Please try again in a moment."
+          : response.status === 402
+          ? "AI credits exhausted. Please add credits to continue."
+          : "Image generation failed";
       return new Response(
-        JSON.stringify({ error: "Gemini API error", details: errorText }),
+        JSON.stringify({ error: message, details: errorText }),
         { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const data = await response.json();
-    console.log("Gemini response received");
-    console.log("Gemini response structure:", JSON.stringify(data, null, 2));
 
-    // Extract the generated image
-    const candidates = data.candidates || [];
-    const images: string[] = [];
-
-    for (const candidate of candidates) {
-      const parts = candidate.content?.parts || [];
-      for (const part of parts) {
-        if (part.inlineData?.data) {
-          const mime = part.inlineData.mimeType || "image/png";
-          images.push(`data:${mime};base64,${part.inlineData.data}`);
-        }
-      }
-    }
+    const images: string[] = (data.data || [])
+      .filter((d: { b64_json?: string }) => d?.b64_json)
+      .map((d: { b64_json: string }) => `data:image/png;base64,${d.b64_json}`);
 
     if (images.length === 0) {
-      console.error("No image returned from Gemini");
+      console.error("No image returned from AI:", JSON.stringify(data).slice(0, 500));
       return new Response(
-        JSON.stringify({ error: "No image returned from Gemini" }),
+        JSON.stringify({ error: "No image was generated" }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
 
     console.log(`Successfully generated ${images.length} image(s)`);
 
